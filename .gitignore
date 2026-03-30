@@ -5,8 +5,12 @@ __pycache__/
 
 .env
 .env.*
+!.env.example
 
 .claude/
 tmp/
 
 structured-output/
+
+# generated prediction files — re-run evals/make_predictions.py to regenerate
+evals/predictions/

@@ -16,6 +16,25 @@ from typing import Iterable
 from structured_pdf_extract import BASE_DIR, build_document
 
 
+def _load_dotenv() -> None:
+    """Load KEY=value pairs from .env at repo root into os.environ (no-op if absent)."""
+    env_path = BASE_DIR / ".env"
+    if not env_path.exists():
+        return
+    for line in env_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip()
+        if key and value and value != "your_key_here" and key not in os.environ:
+            os.environ[key] = value
+
+
+_load_dotenv()
+
+
 DATE_PATTERN = (
     r"(?:January|February|March|April|May|June|July|August|September|October|November|December)"
     r"\s+\d{1,2},\s+\d{4}"
@@ -37,8 +56,8 @@ SEBI_CIRCULAR_RE = re.compile(
 )
 FORMAL_INSTRUMENT_RE = re.compile(
     r"(?P<name>"
-    r"(?:SEBI\s*\([^)]+\)\s*Regulations"
-    r"|Securities\s+and\s+Exchange\s+Board\s+of\s+India\s*\([^)]+\)\s*Regulations"
+    r"(?:SEBI\s*\([^)]+\)\s*Regulations?"
+    r"|Securities\s+and\s+Exchange\s+Board\s+of\s+India\s*\([^)]+\)\s*Regulations?"
     r"|Securities\s+and\s+Exchange\s+Board\s+of\s+India\s+Act"
     r"|Depositories\s+Act"
     r"|Banking\s+Regulations?\s+Act"
@@ -126,7 +145,7 @@ def infer_document_type(name: str) -> str:
         return "master_circular"
     if "circular" in lowered:
         return "circular"
-    if "regulations" in lowered:
+    if re.search(r"\bregulations?\b", lowered):
         return "regulations"
     if "notification" in lowered:
         return "notification"
@@ -279,7 +298,10 @@ def title_from_master_circular(match: re.Match[str]) -> tuple[str | None, str | 
 
     title = "Master Circular"
     if body:
-        title = f"{title} {body}".strip()
+        # Strip a trailing parenthetical acronym from the body (e.g. ("RTAs")) so it
+        # doesn't end up in the title.  The acronym is short enough to ignore as alias.
+        body = re.sub(r'\s*\("?[A-Za-z]{2,10}"?\)\s*$', "", body).strip()
+        title = f"{title} {body}".strip() if body else title
     elif prefix:
         trailer_match = re.match(
             r"for\s+(.+?)(?=\s+\(|\s+(?:has|have|provides|provide|stand|stands|were|was|is|are)\b|$)",
@@ -394,7 +416,7 @@ def explicit_references_for_paragraph(text: str, registry: Registry) -> list[dic
         record = registry.upsert(
             document_type="circular",
             title=None,
-            short_title=f"SEBI Circular {identifier}",
+            short_title=f"SEBI Circular {identifier}" + (f" dated {date}" if date else ""),
             identifier=identifier,
             date=date,
             year=parse_year(date or identifier),
@@ -414,6 +436,9 @@ def explicit_references_for_paragraph(text: str, registry: Registry) -> list[dic
 
     for match in FORMAL_INSTRUMENT_RE.finditer(text):
         full = compact(match.group("name"))
+        # Normalize singular "Regulation" to plural when the matched text uses it
+        # (e.g. "SEBI (Credit Rating Agencies) Regulation, 1999" → "Regulations").
+        full = re.sub(r"\bRegulation\b(?=\s*,\s*(?:19|20)\d{2})", "Regulations", full)
         year = parse_year(match.group("year"))
         record = registry.upsert(
             document_type=infer_document_type(full),
@@ -639,7 +664,7 @@ def call_gemini_json(prompt: str, model: str, api_key: str) -> dict:
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
             "responseMimeType": "application/json",
-            "responseSchema": gemini_review_schema(),
+            "responseJsonSchema": gemini_review_schema(),
         },
     }
     request = urllib.request.Request(
@@ -681,7 +706,7 @@ def apply_ai_reviews(records: list[DocumentRecord], reviews: list[dict]) -> dict
     }
 
 
-def analyze_document(pdf_path: Path, *, use_ai: bool = False, gemini_model: str = "gemini-2.0-flash") -> dict:
+def analyze_document(pdf_path: Path, *, use_ai: bool = False, gemini_model: str = "gemini-2.5-flash") -> dict:
     structured = build_document(pdf_path)
     source = extract_source_metadata(structured)
     registry = Registry()
@@ -766,7 +791,7 @@ def main() -> int:
         help="Directory for reference JSON output files",
     )
     parser.add_argument("--use-ai", action="store_true", help="Enable Gemini review for ambiguous identifier-only references")
-    parser.add_argument("--gemini-model", default="gemini-2.0-flash", help="Gemini model name for optional AI review")
+    parser.add_argument("--gemini-model", default="gemini-2.5-flash", help="Gemini model name for optional AI review")
     args = parser.parse_args()
 
     output_dir = Path(args.output_dir)

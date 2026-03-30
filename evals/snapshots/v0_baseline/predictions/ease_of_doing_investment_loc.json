@@ -1,0 +1,51 @@
+{
+  "fixture_id": "ease_of_doing_investment_loc",
+  "references": [
+    {
+      "canonical_title": "Master Circular for Registrars to an Issue and Share Transfer Agents (\"RTAs\")",
+      "official_identifier": null,
+      "document_type": "master_circular",
+      "source_pages": [
+        1,
+        2
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_title": "Securities and Exchange Board of India Act, 1992",
+      "official_identifier": null,
+      "document_type": "act",
+      "source_pages": [
+        2
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_title": "Depositories Act, 1996",
+      "official_identifier": null,
+      "document_type": "act",
+      "source_pages": [
+        2
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_title": "SEBI (Listing Obligations and Disclosure Requirements) Regulations, 2015",
+      "official_identifier": null,
+      "document_type": "regulations",
+      "source_pages": [
+        2
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_title": "Securities and Exchange Board of India (Registrars to an Issue and Share Transfer Agents) Regulations, 2025",
+      "official_identifier": null,
+      "document_type": "regulations",
+      "source_pages": [
+        2
+      ],
+      "resolved_url": null
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+[
+  {
+    "fixture_id": "cra_other_fsr_obligations",
+    "doc_metrics": {
+      "tp": 1,
+      "pred_total": 1,
+      "gold_total": 2,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6666666666666666
+    },
+    "page_metrics": {
+      "tp": 1,
+      "pred_total": 1,
+      "gold_total": 5,
+      "precision": 1.0,
+      "recall": 0.2,
+      "f1": 0.33333333333333337
+    },
+    "title_exact_recall": 0.5,
+    "title_presence_recall": 0.5,
+    "type_accuracy_on_matched_docs": 1.0,
+    "resolution_precision": null,
+    "resolution_recall": null,
+    "missing_refs": [
+      "sebi_cra_regulations_1999"
+    ],
+    "extra_refs": [],
+    "page_mismatches": []
+  },
+  {
+    "fixture_id": "ease_of_doing_investment_loc",
+    "doc_metrics": {
+      "tp": 4,
+      "pred_total": 5,
+      "gold_total": 5,
+      "precision": 0.8,
+      "recall": 0.8,
+      "f1": 0.8000000000000002
+    },
+    "page_metrics": {
+      "tp": 4,
+      "pred_total": 6,
+      "gold_total": 6,
+      "precision": 0.6666666666666666,
+      "recall": 0.6666666666666666,
+      "f1": 0.6666666666666666
+    },
+    "title_exact_recall": 0.8,
+    "title_presence_recall": 0.8,
+    "type_accuracy_on_matched_docs": 1.0,
+    "resolution_precision": null,
+    "resolution_recall": null,
+    "missing_refs": [
+      "master_circular_rta_2025_06_23"
+    ],
+    "extra_refs": [
+      {
+        "aggregate_key": "pred:master circular for registrars to an issue and share transfer agents rtas",
+        "title": "Master Circular for Registrars to an Issue and Share Transfer Agents (\"RTAs\")",
+        "identifier": null,
+        "pages": [
+          1,
+          2
+        ]
+      }
+    ],
+    "page_mismatches": []
+  },
+  {
+    "fixture_id": "guidelines_for_custodians",
+    "doc_metrics": {
+      "tp": 6,
+      "pred_total": 8,
+      "gold_total": 6,
+      "precision": 0.75,
+      "recall": 1.0,
+      "f1": 0.8571428571428571
+    },
+    "page_metrics": {
+      "tp": 10,
+      "pred_total": 12,
+      "gold_total": 10,
+      "precision": 0.8333333333333334,
+      "recall": 1.0,
+      "f1": 0.9090909090909091
+    },
+    "title_exact_recall": 0.5,
+    "title_presence_recall": 1.0,
+    "type_accuracy_on_matched_docs": 1.0,
+    "resolution_precision": null,
+    "resolution_recall": null,
+    "missing_refs": [],
+    "extra_refs": [
+      {
+        "aggregate_key": "pred:notification",
+        "title": "Notification",
+        "identifier": null,
+        "pages": [
+          1
+        ]
+      },
+      {
+        "aggregate_key": "pred:gazette notification",
+        "title": "Gazette Notification",
+        "identifier": null,
+        "pages": [
+          4
+        ]
+      }
+    ],
+    "page_mismatches": []
+  },
+  {
+    "fixture_id": "stock_broker_reporting_relaxations",
+    "doc_metrics": {
+      "tp": 3,
+      "pred_total": 3,
+      "gold_total": 4,
+      "precision": 1.0,
+      "recall": 0.75,
+      "f1": 0.8571428571428571
+    },
+    "page_metrics": {
+      "tp": 5,
+      "pred_total": 5,
+      "gold_total": 6,
+      "precision": 1.0,
+      "recall": 0.8333333333333334,
+      "f1": 0.9090909090909091
+    },
+    "title_exact_recall": 0.75,
+    "title_presence_recall": 0.75,
+    "type_accuracy_on_matched_docs": 1.0,
+    "resolution_precision": null,
+    "resolution_recall": null,
+    "missing_refs": [
+      "sccr_stock_exchange_cc_regulations_2018"
+    ],
+    "extra_refs": [],
+    "page_mismatches": []
+  },
+  {
+    "fixture_id": "valuation_of_gold_and_silver",
+    "doc_metrics": {
+      "tp": 2,
+      "pred_total": 2,
+      "gold_total": 2,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "page_metrics": {
+      "tp": 2,
+      "pred_total": 2,
+      "gold_total": 2,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "title_exact_recall": 1.0,
+    "title_presence_recall": 1.0,
+    "type_accuracy_on_matched_docs": 1.0,
+    "resolution_precision": null,
+    "resolution_recall": null,
+    "missing_refs": [],
+    "extra_refs": [],
+    "page_mismatches": []
+  }
+]

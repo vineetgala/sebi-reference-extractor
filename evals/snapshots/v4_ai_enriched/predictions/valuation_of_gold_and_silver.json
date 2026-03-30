@@ -1,0 +1,23 @@
+{
+  "fixture_id": "valuation_of_gold_and_silver",
+  "references": [
+    {
+      "canonical_title": "SEBI (Mutual Funds) Regulations, 2026",
+      "official_identifier": null,
+      "document_type": "regulations",
+      "source_pages": [
+        1
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_title": "SEBI (Mutual Funds) Regulations, 1996",
+      "official_identifier": null,
+      "document_type": "regulations",
+      "source_pages": [
+        2
+      ],
+      "resolved_url": null
+    }
+  ]
+}

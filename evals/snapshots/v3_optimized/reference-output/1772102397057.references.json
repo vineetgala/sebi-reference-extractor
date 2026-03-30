@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0.0",
   "extraction_method": {
-    "mode": "deterministic_with_optional_ai_review",
+    "mode": "deterministic",
     "layout_parser": "pdfminer + pypdf via structured_pdf_extract.py",
-    "llm_used": true
+    "llm_used": false
   },
   "source_document": {
     "source_pdf": "pdfs/1772102397057.pdf",
@@ -14,9 +14,9 @@
     "title": "Valuation of physical Gold and Silver held by mutual fund schemes"
   },
   "ai_enrichment": {
-    "enabled": true,
-    "provider": "gemini",
-    "model": "gemini-2.5-flash",
+    "enabled": false,
+    "provider": null,
+    "model": null,
     "reviewed_document_ids": [],
     "changes_applied": 0
   },

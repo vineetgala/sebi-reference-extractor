@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0.0",
   "extraction_method": {
-    "mode": "deterministic_with_optional_ai_review",
+    "mode": "deterministic",
     "layout_parser": "pdfminer + pypdf via structured_pdf_extract.py",
-    "llm_used": true
+    "llm_used": false
   },
   "source_document": {
     "source_pdf": "pdfs/1772622419912.pdf",
@@ -14,14 +14,11 @@
     "title": "Guidelines for Custodians"
   },
   "ai_enrichment": {
-    "enabled": true,
-    "provider": "gemini",
-    "model": "gemini-2.5-flash",
-    "reviewed_document_ids": [
-      "doc_004",
-      "doc_005"
-    ],
-    "changes_applied": 1
+    "enabled": false,
+    "provider": null,
+    "model": null,
+    "reviewed_document_ids": [],
+    "changes_applied": 0
   },
   "referenced_documents": [
     {
@@ -82,15 +79,15 @@
       "document_type": "circular",
       "title": null,
       "short_title": "SEBI Circular CIR/MIRSD/5/2013 dated August 27, 2013",
-      "descriptive_title": "for dealing with conflict of interest",
-      "descriptive_title_source": "purpose_clause_in_evidence",
+      "descriptive_title": null,
+      "descriptive_title_source": null,
       "identifier": "CIR/MIRSD/5/2013",
       "date": "August 27, 2013",
       "year": 2013,
       "issuing_body": "SEBI",
       "aliases": [],
       "title_source": "not_present_in_text",
-      "ai_review_notes": "",
+      "ai_review_notes": null,
       "resolution_status": "unresolved",
       "resolved_url": null
     },
@@ -107,7 +104,7 @@
       "issuing_body": "SEBI",
       "aliases": [],
       "title_source": "not_present_in_text",
-      "ai_review_notes": "",
+      "ai_review_notes": null,
       "resolution_status": "unresolved",
       "resolved_url": null
     },

@@ -1,0 +1,63 @@
+{
+  "fixture_id": "guidelines_for_custodians",
+  "references": [
+    {
+      "canonical_title": "SEBI (Custodian) Regulations, 1996",
+      "official_identifier": null,
+      "document_type": "regulations",
+      "source_pages": [
+        1,
+        2,
+        4,
+        10
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_title": "Banking Regulations Act, 1949",
+      "official_identifier": null,
+      "document_type": "act",
+      "source_pages": [
+        1
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_title": "SEBI Circular CIR/MIRSD/5/2013 dated August 27, 2013",
+      "official_identifier": "CIR/MIRSD/5/2013",
+      "document_type": "circular",
+      "source_pages": [
+        3
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_title": "SEBI Circular CIR/MIRSD/24/2011 dated 15 Dec 2011",
+      "official_identifier": "CIR/MIRSD/24/2011",
+      "document_type": "circular",
+      "source_pages": [
+        3
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_title": "Master Circular for Custodians",
+      "official_identifier": null,
+      "document_type": "master_circular",
+      "source_pages": [
+        3,
+        9
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_title": "Securities and Exchange Board of India Act, 1992",
+      "official_identifier": null,
+      "document_type": "act",
+      "source_pages": [
+        10
+      ],
+      "resolved_url": null
+    }
+  ]
+}
