@@ -20,10 +20,10 @@
     "discovered_count": 0
   },
   "url_resolution": {
-    "enabled": true,
+    "enabled": false,
     "resolved": 0,
-    "resolved_approx": 1,
-    "unresolved": 1
+    "resolved_approx": 0,
+    "unresolved": 0
   },
   "referenced_documents": [
     {
@@ -37,8 +37,8 @@
       "issuing_body": "SEBI",
       "aliases": [],
       "title_source": "explicit_in_text",
-      "resolution_status": "resolved_approx",
-      "resolved_url": "https://www.sebi.gov.in/legal/regulations/jan-2026/securities-and-exchange-board-of-india-mutual-funds-regulations-2026_99173.html"
+      "resolution_status": "unresolved",
+      "resolved_url": null
     },
     {
       "document_id": "doc_002",

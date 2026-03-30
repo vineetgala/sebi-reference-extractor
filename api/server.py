@@ -8,8 +8,7 @@ Swagger UI:   http://localhost:8000/docs
 ReDoc:        http://localhost:8000/redoc
 
 Inputs accepted by POST /extract
-  • file upload  — multipart PDF upload
-  • url          — SEBI circular webpage URL  OR  direct PDF URL
+  • url — SEBI circular webpage URL  OR  direct PDF URL
     Both URL types are auto-detected; no flag needed.
 """
 
@@ -24,7 +23,7 @@ import urllib.request
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, File, Form, HTTPException, Query, UploadFile
+from fastapi import FastAPI, Form, HTTPException, Query
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
 
@@ -146,7 +145,7 @@ class ExtractionMethod(BaseModel):
 
 class SourceDocument(BaseModel):
     source_pdf: str = Field(
-        description="The PDF's source — the original filename (upload) or direct PDF URL (URL input).",
+        description="The direct PDF URL that was downloaded and processed.",
         examples=["1769773760624.pdf"],
     )
     file_name: str = Field(description="Basename of the PDF.")
@@ -295,10 +294,9 @@ app = FastAPI(
         "master circulars, regulations, acts, and notifications — with source page, surrounding "
         "context, locator detail, and an optional Gemini-powered discovery pass.\n\n"
         "## Inputs\n\n"
-        "`POST /extract` accepts **one** of:\n\n"
+        "`POST /extract` requires a `url` parameter:\n\n"
         "| Field | Type | Description |\n"
         "|---|---|---|\n"
-        "| `file` | PDF upload | Local PDF file (multipart form) |\n"
         "| `url` | string | SEBI circular **webpage** URL *or* direct **PDF** URL — "
         "both are auto-detected, no flag needed |\n\n"
         "Examples of accepted URLs:\n"
@@ -344,18 +342,13 @@ def health():
     tags=["Extraction"],
     responses={
         200: {"description": "Extraction succeeded."},
-        400: {"description": "Bad input — wrong file type, no PDF found on page, missing AI key."},
+        400: {"description": "Bad input — no PDF found on page, missing AI key."},
         422: {"description": "Validation error — missing required fields."},
         500: {"description": "Unexpected extraction failure."},
     },
 )
 def extract_references(
-    file: Optional[UploadFile] = File(
-        default=None,
-        description="SEBI circular PDF. Provide either this **or** `url`, not both.",
-    ),
-    url: Optional[str] = Form(
-        default=None,
+    url: str = Form(
         description=(
             "URL of a SEBI circular. Accepted formats:\n\n"
             "- **Webpage URL** — the HTML page on sebi.gov.in "
@@ -363,8 +356,7 @@ def extract_references(
             "The server fetches the page, finds the PDF attachment link, and downloads it.\n\n"
             "- **Direct PDF URL** — a URL whose path ends in `.pdf` "
             "(e.g. `https://www.sebi.gov.in/sebi_data/attachdocs/jan-2026/1769773760624.pdf`). "
-            "Downloaded directly.\n\n"
-            "Provide either this **or** `file`, not both."
+            "Downloaded directly."
         ),
     ),
     use_ai: bool = Query(
@@ -390,9 +382,7 @@ def extract_references(
     """
     Extract all outbound document references from a SEBI circular.
 
-    Provide the circular as **one** of:
-    - `file` — a PDF upload
-    - `url` — a SEBI circular webpage URL or a direct PDF URL (auto-detected)
+    Provide the circular via `url` — a SEBI circular webpage URL or a direct PDF URL (auto-detected).
 
     The response contains:
     - **`referenced_documents`** — deduplicated list of every external document found.
@@ -400,52 +390,13 @@ def extract_references(
     - **`source_document`** — metadata extracted from the circular itself.
     - **`summary`** — counts and pages-with-references list.
     """
-    # ── Validate: exactly one source required ──────────────────────────────
-    has_file = file is not None and file.filename
-    has_url  = url is not None and url.strip()
-
-    if not has_file and not has_url:
-        raise HTTPException(
-            status_code=400,
-            detail="Provide either 'file' (PDF upload) or 'url' (SEBI page or PDF URL).",
-        )
-    if has_file and has_url:
-        raise HTTPException(
-            status_code=400,
-            detail="Provide either 'file' or 'url', not both.",
-        )
-
     # ── Acquire PDF bytes + metadata ───────────────────────────────────────
-    pdf_bytes: bytes
-    display_name: str   # shown in source_document.file_name
-    source_ref: str     # shown in source_document.source_pdf
-    submitted_url: Optional[str] = None
-
-    if has_url:
-        submitted_url = url.strip()
-        try:
-            pdf_bytes, display_name, pdf_url = _resolve_pdf_from_url(submitted_url)
-        except ValueError as exc:
-            raise HTTPException(status_code=400, detail=str(exc))
-        source_ref = pdf_url
-
-    else:
-        fname = file.filename or "upload.pdf"
-        if not fname.lower().endswith(".pdf"):
-            raise HTTPException(
-                status_code=400,
-                detail=f"Only PDF files are accepted. Received: '{fname}'",
-            )
-        chunks: list[bytes] = []
-        while True:
-            chunk = file.file.read(1 << 20)  # 1 MiB
-            if not chunk:
-                break
-            chunks.append(chunk)
-        file.file.close()
-        pdf_bytes = b"".join(chunks)
-        display_name = fname
-        source_ref   = fname
+    submitted_url = url.strip()
+    try:
+        pdf_bytes, display_name, pdf_url = _resolve_pdf_from_url(submitted_url)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    source_ref = pdf_url
 
     if not pdf_bytes:
         raise HTTPException(status_code=400, detail="Received an empty PDF.")
@@ -458,7 +409,7 @@ def extract_references(
             tmp.write(pdf_bytes)
 
         try:
-            result = analyze_document(tmp_path, use_ai=use_ai, resolve_urls=resolve_urls, gemini_model=gemini_model)
+            _structured, result = analyze_document(tmp_path, use_ai=use_ai, resolve_urls=resolve_urls, gemini_model=gemini_model)
         except RuntimeError as exc:
             raise HTTPException(status_code=400, detail=str(exc))
         except (ValueError, urllib.error.URLError) as exc:
@@ -469,8 +420,7 @@ def extract_references(
         # ── Patch source_document with the actual input identifiers ────────
         result["source_document"]["source_pdf"] = source_ref
         result["source_document"]["file_name"]  = display_name
-        if submitted_url:
-            result["source_document"]["source_url"] = submitted_url
+        result["source_document"]["source_url"] = submitted_url
 
         return result
 

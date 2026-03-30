@@ -61,7 +61,7 @@ def main() -> int:
             {
                 "page_url": page_url,
                 "pdf_url": pdf_url,
-                "pdf_path": str(pdf_path),
+                "pdf_path": f"pdfs/{pdf_name}",
                 "bytes": pdf_path.stat().st_size,
             }
         )
