@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SEBI Reference Viewer</title>
+  <title>Reference Viewer</title>
   <style>
     /* ─── RESET ─── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -44,6 +44,8 @@
       min-height: 100vh;
     }
 
+    .hidden { display: none !important; }
+
     /* ─── TOPBAR ─── */
     .topbar {
       background: var(--surface);
@@ -77,9 +79,153 @@
     }
     .brand-sep { color: var(--light); }
 
-    .sel-wrap { display: flex; align-items: center; gap: 8px; }
+    /* ─── MODE SWITCHER ─── */
+    .mode-switcher {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      background: var(--bg);
+      border-radius: 6px;
+      padding: 3px;
+    }
+    .mode-btn {
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      background: transparent;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 13px;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      white-space: nowrap;
+    }
+    .mode-btn:hover { color: var(--text); }
+    .mode-btn.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,.10);
+    }
+
+    /* ─── CONTROL STRIPS ─── */
+    .control-strip {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+    }
+
+    /* Extract form */
+    .extract-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    .form-field { display: flex; flex-direction: column; gap: 4px; }
+    .form-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: .03em;
+    }
+    .form-field.url-field  { flex: 2; min-width: 260px; }
+    .form-field.name-field { flex: 1; min-width: 160px; }
+    input.form-input {
+      font-family: inherit;
+      font-size: 13px;
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      background: var(--bg);
+      color: var(--text);
+      padding: 7px 10px;
+      width: 100%;
+      transition: border-color .15s, background .15s;
+    }
+    input.form-input:focus {
+      outline: 2px solid #2563eb;
+      outline-offset: 1px;
+      border-color: transparent;
+      background: var(--surface);
+    }
+    .ai-toggle {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      padding-bottom: 7px;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .ai-toggle input {
+      cursor: pointer;
+      accent-color: #2563eb;
+      width: 14px;
+      height: 14px;
+    }
+    .extract-btn {
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #fff;
+      background: #1d4ed8;
+      border: none;
+      border-radius: var(--r-sm);
+      padding: 8px 18px;
+      cursor: pointer;
+      transition: background .15s;
+      white-space: nowrap;
+      align-self: flex-end;
+    }
+    .extract-btn:hover:not(:disabled) { background: #1e40af; }
+    .extract-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    /* Session history */
+    .history-section {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .history-head {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--light);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .history-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .history-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 12px 4px 10px;
+      font-size: 12px;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color .15s, box-shadow .15s;
+      max-width: 300px;
+    }
+    .history-chip:hover { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,.10); }
+    .history-chip.active { border-color: #2563eb; background: #eff6ff; }
+    .history-chip-name {
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 200px;
+    }
+    .history-chip-count { font-size: 10.5px; color: var(--muted); white-space: nowrap; }
+
+    /* Golden selector */
+    .golden-sel-wrap { display: flex; align-items: center; gap: 8px; }
     .sel-label { font-size: 12px; color: var(--muted); white-space: nowrap; }
-    select#doc-sel {
+    select#golden-sel {
       font-family: inherit;
       font-size: 12.5px;
       border: 1px solid var(--border);
@@ -92,9 +238,11 @@
       background-repeat: no-repeat;
       background-position: right 8px center;
       cursor: pointer;
-      max-width: 420px;
+      min-width: 320px;
+      max-width: 540px;
     }
-    select#doc-sel:focus { outline: 2px solid #2563eb; outline-offset: 1px; border-color: transparent; }
+    select#golden-sel:focus { outline: 2px solid #2563eb; outline-offset: 1px; border-color: transparent; }
+    .golden-note { font-size: 11.5px; color: var(--muted); margin-top: 8px; }
 
     /* ─── META STRIP ─── */
     #meta-strip {
@@ -123,6 +271,7 @@
       font-weight: 600;
       color: #475569;
     }
+    .pill.ai { background: #fef3c7; color: #92400e; }
 
     /* ─── PAGE LAYOUT ─── */
     .layout {
@@ -251,10 +400,10 @@
       align-items: flex-start;
     }
     .doc-card-title { font-size: 12px; font-weight: 600; line-height: 1.4; flex: 1; }
-    .doc-card-meta { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
-    .doc-card-id { font-family: ui-monospace, monospace; font-size: 10.5px; color: var(--muted); margin-bottom: 2px; }
+    .doc-card-meta  { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+    .doc-card-id    { font-family: ui-monospace, monospace; font-size: 10.5px; color: var(--muted); margin-bottom: 2px; }
     .doc-card-count { font-size: 10.5px; color: var(--light); }
-    .doc-card-link {
+    .doc-card-link  {
       display: inline-block;
       margin-top: 5px;
       font-size: 10.5px;
@@ -335,10 +484,10 @@
     .conf-med  .conf-fill { background: #f59e0b; }
     .conf-low  .conf-fill { background: #ef4444; }
 
-    .tip-ctx  { font-size: 11.5px; color: var(--muted); line-height: 1.7; }
-    .tip-ctx mark { background: transparent; font-weight: 700; color: var(--text); }
+    .tip-ctx       { font-size: 11.5px; color: var(--muted); line-height: 1.7; }
+    .tip-ctx mark  { background: transparent; font-weight: 700; color: var(--text); }
 
-    /* ─── EMPTY STATE ─── */
+    /* ─── EMPTY / LOADING / ERROR ─── */
     .empty {
       text-align: center;
       color: var(--muted);
@@ -348,6 +497,39 @@
     }
     .empty-icon { font-size: 38px; margin-bottom: 14px; }
     .empty-sub  { font-size: 12px; color: var(--light); margin-top: 6px; }
+
+    .loading-state { text-align: center; color: var(--muted); padding: 72px 24px; }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-msg { font-size: 13.5px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+    .loading-sub { font-size: 12px; color: var(--light); }
+
+    .error-state { text-align: center; padding: 72px 24px; }
+    .error-icon  { font-size: 38px; margin-bottom: 14px; }
+    .error-title { font-size: 14px; font-weight: 700; color: #dc2626; margin-bottom: 8px; }
+    .error-detail {
+      font-size: 12px;
+      color: var(--muted);
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: var(--r-sm);
+      padding: 10px 16px;
+      max-width: 480px;
+      margin: 0 auto 12px;
+      text-align: left;
+      font-family: ui-monospace, monospace;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+    .error-help      { font-size: 12px; color: var(--light); line-height: 1.8; }
+    .error-help code { font-family: ui-monospace, monospace; background: #f1f5f9; padding: 1px 5px; border-radius: 3px; }
 
     /* ─── SCROLLBAR ─── */
     ::-webkit-scrollbar { width: 5px; }
@@ -364,13 +546,52 @@
     <span class="brand-sep">|</span>
     Reference Viewer
   </div>
-  <div class="sel-wrap">
-    <span class="sel-label">Circular:</span>
-    <select id="doc-sel">
-      <option value="">— select a document —</option>
-    </select>
+  <div class="mode-switcher">
+    <button class="mode-btn active" data-mode="extract" onclick="switchMode('extract')">Extract New</button>
+    <button class="mode-btn"        data-mode="golden"  onclick="switchMode('golden')">Golden Dataset</button>
   </div>
 </header>
+
+<!-- EXTRACT CONTROL STRIP -->
+<div id="extract-panel" class="control-strip">
+  <div class="extract-form">
+    <div class="form-field url-field">
+      <label class="form-label" for="url-input">Document URL</label>
+      <input id="url-input" type="url" class="form-input"
+        placeholder="https://www.sebi.gov.in/legal/circulars/… or direct PDF URL" />
+    </div>
+    <div class="form-field name-field">
+      <label class="form-label" for="name-input">Name <span style="font-weight:400;color:var(--light)">(optional)</span></label>
+      <input id="name-input" type="text" class="form-input"
+        placeholder="e.g. CRA Circular Feb 2026" />
+    </div>
+    <label class="ai-toggle" title="Requires GEMINI_API_KEY in .env">
+      <input type="checkbox" id="ai-toggle" />
+      AI discovery
+    </label>
+    <button class="extract-btn" id="extract-btn" onclick="handleExtract()">
+      Extract References
+    </button>
+  </div>
+  <div id="history-section" class="history-section hidden">
+    <div class="history-head">This session</div>
+    <div id="history-list" class="history-list"></div>
+  </div>
+</div>
+
+<!-- GOLDEN CONTROL STRIP -->
+<div id="golden-panel" class="control-strip hidden">
+  <div class="golden-sel-wrap">
+    <span class="sel-label">Circular:</span>
+    <select id="golden-sel">
+      <option value="">— select a pre-analysed circular —</option>
+    </select>
+  </div>
+  <div class="golden-note">
+    Five hand-labelled SEBI circulars with verified reference extraction (v5 · 100% Doc F1 · 100% Page F1).
+    Full document text available. Hover any highlight for reference detail.
+  </div>
+</div>
 
 <!-- META STRIP -->
 <div id="meta-strip">
@@ -383,8 +604,8 @@
   <div class="text-panel" id="text-panel">
     <div class="empty">
       <div class="empty-icon">📄</div>
-      Select a SEBI circular above to explore its document references.
-      <div class="empty-sub">Five circulars available · hover any highlight for reference detail</div>
+      Enter a URL above to extract references from any SEBI circular.
+      <div class="empty-sub">Accepts SEBI webpage URLs or direct PDF URLs · hover any highlight for reference detail</div>
     </div>
   </div>
   <div class="sidebar" id="sidebar"></div>
@@ -394,6 +615,19 @@
 <div id="tip"></div>
 
 <script>
+// ═══════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════
+const API_BASE = 'http://localhost:8000';
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+const sessionCache = {}; // id → { refs, pagesData, name }
+const sessionOrder = []; // newest-first list of session ids
+const goldenCache  = {}; // id → { refs, pagesData }
+let activeId = null;
+
 // ═══════════════════════════════════════════
 //  CONSTANTS
 // ═══════════════════════════════════════════
@@ -425,12 +659,79 @@ const tlabel = t => TYPE_LABEL[t] || t;
 const ticon  = t => TYPE_ICON[t]  || '📄';
 const rlabel = r => RELATION_LABEL[r] || r;
 
-/**
- * Build highlighted HTML for a paragraph.
- * entries: [{matchText, docType, mentionId, docId}, …]
- */
+// ═══════════════════════════════════════════
+//  MODE SWITCHER
+// ═══════════════════════════════════════════
+function switchMode(mode) {
+  document.querySelectorAll('.mode-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.mode === mode));
+  document.getElementById('extract-panel').classList.toggle('hidden', mode !== 'extract');
+  document.getElementById('golden-panel').classList.toggle('hidden', mode !== 'golden');
+  hideTip();
+  // When nothing is loaded, update the empty state to match the active mode
+  if (!activeId) {
+    if (mode === 'golden') {
+      showEmpty(
+        'Select a pre-analysed circular above to explore its references.',
+        'Five hand-labelled circulars · full document text · hover any highlight for detail'
+      );
+    } else {
+      showEmpty(
+        'Enter a URL above to extract references from any SEBI circular.',
+        'Accepts SEBI webpage URLs or direct PDF URLs · hover any highlight for reference detail'
+      );
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+//  STATE DISPLAY
+// ═══════════════════════════════════════════
+function showEmpty(msg, sub) {
+  document.getElementById('text-panel').innerHTML = `
+    <div class="empty">
+      <div class="empty-icon">📄</div>
+      ${msg}
+      ${sub ? `<div class="empty-sub">${sub}</div>` : ''}
+    </div>`;
+  document.getElementById('sidebar').innerHTML = '';
+  document.getElementById('meta-strip').classList.remove('on');
+  activeId = null;
+}
+
+function showLoading(msg, sub) {
+  document.getElementById('text-panel').innerHTML = `
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <div class="loading-msg">${esc(msg)}</div>
+      ${sub ? `<div class="loading-sub">${esc(sub)}</div>` : ''}
+    </div>`;
+  document.getElementById('sidebar').innerHTML = '';
+  document.getElementById('meta-strip').classList.remove('on');
+}
+
+function showError(title, detail) {
+  const isNetworkErr = detail &&
+    (detail.includes('Failed to fetch') || detail.includes('NetworkError') ||
+     detail.includes('connect') || detail.includes('ECONNREFUSED'));
+  const helpHtml = isNetworkErr
+    ? `Make sure the API server is running:<br><code>uvicorn api.server:app --reload --port 8000</code>`
+    : `Check the API server logs for more detail.`;
+  document.getElementById('text-panel').innerHTML = `
+    <div class="error-state">
+      <div class="error-icon">⚠️</div>
+      <div class="error-title">${esc(title)}</div>
+      ${detail ? `<div class="error-detail">${esc(detail)}</div>` : ''}
+      <div class="error-help">${helpHtml}</div>
+    </div>`;
+  document.getElementById('sidebar').innerHTML = '';
+  document.getElementById('meta-strip').classList.remove('on');
+}
+
+// ═══════════════════════════════════════════
+//  HIGHLIGHT BUILDER
+// ═══════════════════════════════════════════
 function buildHighlightHtml(text, entries) {
-  // Collect all match positions
   const spans = [];
   for (const e of entries) {
     if (!e.matchText) continue;
@@ -442,20 +743,13 @@ function buildHighlightHtml(text, entries) {
       idx = pos + e.matchText.length;
     }
   }
-
-  // Sort: earlier start first; on equal start, longer span wins
   spans.sort((a, b) =>
-    a.start !== b.start ? a.start - b.start : (b.end - b.start) - (a.end - a.start)
-  );
-
-  // Remove overlapping spans (keep first encountered)
+    a.start !== b.start ? a.start - b.start : (b.end - b.start) - (a.end - a.start));
   const kept = [];
   let cursor = 0;
   for (const s of spans) {
     if (s.start >= cursor) { kept.push(s); cursor = s.end; }
   }
-
-  // Render
   let html = '', pos = 0;
   for (const s of kept) {
     html += esc(text.slice(pos, s.start));
@@ -467,9 +761,6 @@ function buildHighlightHtml(text, entries) {
   return html + esc(text.slice(pos));
 }
 
-/**
- * Short evidence snippet for the tooltip, with the match bolded.
- */
 function contextSnippet(evidence, matchText) {
   if (!evidence) return '';
   const idx = evidence.indexOf(matchText);
@@ -486,9 +777,6 @@ function contextSnippet(evidence, matchText) {
     (hi < evidence.length ? '…' : '');
 }
 
-/**
- * Locator chips HTML from a target_locators object.
- */
 function locatorChipsHtml(loc) {
   if (!loc) return '';
   const chips = [
@@ -551,7 +839,12 @@ function showTip(e, mentionId, mentionMap, docMap) {
       <div class="conf-track"><div class="conf-fill" style="width:${confPct}%"></div></div>
     </div>
     <div class="tip-ctx">${contextSnippet(m.evidence_text || '', matchText)}</div>
-    ${doc.resolved_url ? `<div style="margin-top:10px"><a href="${esc(doc.resolved_url)}" target="_blank" rel="noopener" style="font-size:11.5px;color:#2563eb;text-decoration:none;" onmouseenter="this.style.textDecoration='underline'" onmouseleave="this.style.textDecoration='none'">↗ View on SEBI</a></div>` : ''}
+    ${doc.resolved_url
+      ? `<div style="margin-top:10px"><a href="${esc(doc.resolved_url)}" target="_blank" rel="noopener"
+           style="font-size:11.5px;color:#2563eb;text-decoration:none;"
+           onmouseenter="this.style.textDecoration='underline'"
+           onmouseleave="this.style.textDecoration='none'">↗ View on SEBI</a></div>`
+      : ''}
   `;
 
   positionTip(e);
@@ -591,38 +884,41 @@ document.addEventListener('mousemove', e => { if (tipOn && !tipEl.matches(':hove
 //  RENDER
 // ═══════════════════════════════════════════
 function render(refs, pagesData) {
-  // Build lookup maps
   const docMap     = Object.fromEntries(refs.referenced_documents.map(d => [d.document_id, d]));
   const mentionMap = Object.fromEntries(refs.reference_mentions.map(m => [m.mention_id, m]));
 
-  // Group mentions: page → paragraphId → {evidenceText, mentions[]}
+  // Group mentions: page → paragraphId → { evidenceText, mentions[] }
+  // AI-discovered references have null source_paragraph_id; give each a unique synthetic
+  // key so their individual evidenceText is preserved and each renders as its own card.
+  let _nullSeq = 0;
   const byPage = {};
   for (const m of refs.reference_mentions) {
     if (!byPage[m.source_page]) byPage[m.source_page] = {};
-    const pid = m.source_paragraph_id;
+    const pid = (m.source_paragraph_id != null) ? m.source_paragraph_id : `__ai_${_nullSeq++}`;
     if (!byPage[m.source_page][pid])
       byPage[m.source_page][pid] = { evidenceText: m.evidence_text, mentions: [] };
     byPage[m.source_page][pid].mentions.push(m);
   }
-  const pages = Object.keys(byPage).map(Number).sort((a, b) => a - b);
-  // pages is used only as fallback when pagesData is unavailable
+  const pagesWithRefs = Object.keys(byPage).map(Number).sort((a, b) => a - b);
 
   // ── Meta strip ──
-  const src = refs.source_document;
+  const src       = refs.source_document;
+  const aiEnabled = refs.ai_discovery && refs.ai_discovery.enabled;
   document.getElementById('meta-title').textContent = src.title || src.file_name;
   document.getElementById('meta-sub').innerHTML = [
     src.circular_number ? `<span>${esc(src.circular_number)}</span>` : '',
     src.issue_date      ? `<span>·&nbsp;${esc(src.issue_date)}</span>` : '',
     `<span class="pill">${refs.referenced_documents.length}&nbsp;docs&nbsp;referenced</span>`,
     `<span class="pill">${refs.reference_mentions.length}&nbsp;mentions</span>`,
-    `<span class="pill">${pages.length}&nbsp;pages&nbsp;with&nbsp;refs</span>`,
+    `<span class="pill">${pagesWithRefs.length}&nbsp;pages&nbsp;with&nbsp;refs</span>`,
+    aiEnabled ? `<span class="pill ai">AI discovery</span>` : '',
   ].filter(Boolean).join('');
   document.getElementById('meta-strip').classList.add('on');
 
   // ── Legend ──
   const typesPresent = [...new Set(refs.referenced_documents.map(d => d.document_type))];
-  const hlVarMap  = { act:'--hl-act', regulations:'--hl-regs', master_circular:'--hl-mc', circular:'--hl-circ', notification:'--hl-notif' };
-  const cVarMap   = { act:'--c-act',  regulations:'--c-regs',  master_circular:'--c-mc',  circular:'--c-circ',  notification:'--c-notif'  };
+  const hlVarMap = { act:'--hl-act', regulations:'--hl-regs', master_circular:'--hl-mc', circular:'--hl-circ', notification:'--hl-notif' };
+  const cVarMap  = { act:'--c-act',  regulations:'--c-regs',  master_circular:'--c-mc',  circular:'--c-circ',  notification:'--c-notif'  };
   const legendHtml = `<div class="legend">${typesPresent.map(t =>
     `<div class="legend-item">
       <div class="legend-dot" style="background:var(${hlVarMap[t]||'--hl-circ'});border:1.5px solid var(${cVarMap[t]||'--c-circ'})"></div>
@@ -631,25 +927,29 @@ function render(refs, pagesData) {
   ).join('')}</div>`;
 
   // ── Scope note ──
-  const totalPages = pagesData ? pagesData.pages.length : src.page_count || '?';
+  const totalPages   = pagesData ? pagesData.pages.length : (src.page_count || '?');
+  const partialNote  = pagesData ? '' : ' · showing only pages with references';
   const scopeNote = `<div class="scope-note">
-    ${totalPages} pages · ${refs.referenced_documents.length} documents referenced · hover any highlight for reference detail · click a document in the sidebar to jump to its first mention
+    ${totalPages} pages · ${refs.referenced_documents.length} documents referenced${partialNote} · hover any highlight for reference detail · click a document in the sidebar to jump to its first mention
   </div>`;
 
-  // ── Page blocks (full document text) ──
+  // ── Page blocks ──
   let pagesHtml = '';
-  const pageSource = pagesData ? pagesData.pages : pages.map(pg => ({
-    page_number: pg,
-    paragraphs: Object.values(byPage[pg]).map(p => ({ paragraph_id: null, text: p.evidenceText })),
-  }));
+  const pageSource = pagesData
+    ? pagesData.pages
+    : pagesWithRefs.map(pg => ({
+        page_number: pg,
+        paragraphs: Object.entries(byPage[pg]).map(([pid, p]) => ({ paragraph_id: pid, text: p.evidenceText })),
+      }));
 
   for (const page of pageSource) {
     const pg = page.page_number;
     pagesHtml += `<div class="page-block" id="page-${pg}"><div class="page-label">Page&nbsp;${pg}</div>`;
+    const renderedPids = new Set();
     for (const para of page.paragraphs) {
+      renderedPids.add(para.paragraph_id);
       const paraData = byPage[pg]?.[para.paragraph_id];
       if (paraData) {
-        // Paragraph contains references — highlight them
         const entries = [];
         for (const m of paraData.mentions) {
           const doc = docMap[m.document_id];
@@ -659,8 +959,21 @@ function render(refs, pagesData) {
         }
         pagesHtml += `<div class="para-card">${buildHighlightHtml(paraData.evidenceText || para.text, entries)}</div>`;
       } else {
-        // Plain paragraph — no reference
         pagesHtml += `<div class="para-card no-ref">${esc(para.text)}</div>`;
+      }
+    }
+    // Append any AI-discovered mentions whose paragraph ID wasn't in the real page structure
+    if (byPage[pg]) {
+      for (const [pid, group] of Object.entries(byPage[pg])) {
+        if (renderedPids.has(pid)) continue;
+        const entries = [];
+        for (const m of group.mentions) {
+          const doc = docMap[m.document_id];
+          for (const mt of (m.match_texts || [])) {
+            entries.push({ matchText: mt, docType: doc?.document_type || 'circular', mentionId: m.mention_id, docId: m.document_id });
+          }
+        }
+        pagesHtml += `<div class="para-card">${buildHighlightHtml(group.evidenceText || '', entries)}</div>`;
       }
     }
     pagesHtml += `</div>`;
@@ -668,7 +981,7 @@ function render(refs, pagesData) {
 
   document.getElementById('text-panel').innerHTML = legendHtml + scopeNote + pagesHtml;
 
-  // ── Attach hover/active events to marks ──
+  // Attach hover events to highlights
   document.querySelectorAll('mark.rh').forEach(el => {
     el.addEventListener('mouseenter', e => {
       showTip(e, el.dataset.mid, mentionMap, docMap);
@@ -681,17 +994,17 @@ function render(refs, pagesData) {
   // ── Sidebar ──
   const countByDoc = {}, pagesByDoc = {};
   for (const m of refs.reference_mentions) {
-    countByDoc[m.document_id]  = (countByDoc[m.document_id] || 0) + 1;
+    countByDoc[m.document_id] = (countByDoc[m.document_id] || 0) + 1;
     if (!pagesByDoc[m.document_id]) pagesByDoc[m.document_id] = new Set();
     pagesByDoc[m.document_id].add(m.source_page);
   }
 
   let sbHtml = `<div class="sidebar-head">Referenced Documents&nbsp;(${refs.referenced_documents.length})</div>`;
   for (const doc of refs.referenced_documents) {
-    const title  = doc.title || doc.short_title || doc.identifier || '(Unknown)';
-    const cnt    = countByDoc[doc.document_id] || 0;
-    const pgs    = pagesByDoc[doc.document_id] ? [...pagesByDoc[doc.document_id]].sort((a,b)=>a-b) : [];
-    const meta   = [doc.issuing_body, doc.date || (doc.year ? String(doc.year) : '')].filter(Boolean).join(' · ');
+    const title = doc.title || doc.short_title || doc.identifier || '(Unknown)';
+    const cnt   = countByDoc[doc.document_id] || 0;
+    const pgs   = pagesByDoc[doc.document_id] ? [...pagesByDoc[doc.document_id]].sort((a,b)=>a-b) : [];
+    const meta  = [doc.issuing_body, doc.date || (doc.year ? String(doc.year) : '')].filter(Boolean).join(' · ');
     sbHtml += `
       <div class="doc-card" data-did="${doc.document_id}">
         <div class="doc-card-top">
@@ -706,9 +1019,8 @@ function render(refs, pagesData) {
   }
   document.getElementById('sidebar').innerHTML = sbHtml;
 
-  // Sidebar click → scroll to first mention of that doc
   document.querySelectorAll('.doc-card').forEach(card => {
-    card.addEventListener('click', (e) => {
+    card.addEventListener('click', e => {
       if (e.target.closest('a')) return;
       const did   = card.dataset.did;
       const first = document.querySelector(`mark.rh[data-did="${did}"]`);
@@ -720,12 +1032,129 @@ function render(refs, pagesData) {
 }
 
 // ═══════════════════════════════════════════
-//  INIT
+//  SESSION HISTORY
 // ═══════════════════════════════════════════
-async function init() {
-  const manifest = await fetch('/manifest.json').then(r => r.json());
+function updateSessionHistory(currentId) {
+  const section = document.getElementById('history-section');
+  const list    = document.getElementById('history-list');
+  if (sessionOrder.length === 0) {
+    section.classList.add('hidden');
+    return;
+  }
+  section.classList.remove('hidden');
+  list.innerHTML = sessionOrder.map(id => {
+    const item = sessionCache[id];
+    if (!item) return '';
+    const isActive = id === currentId;
+    const cnt  = item.refs.referenced_documents.length;
+    const name = item.name;
+    const disp = name.length > 50 ? name.slice(0, 47) + '…' : name;
+    return `<div class="history-chip${isActive ? ' active' : ''}" data-id="${esc(id)}">
+      <span class="history-chip-name" title="${esc(name)}">${esc(disp)}</span>
+      <span class="history-chip-count">${cnt} doc${cnt !== 1 ? 's' : ''}</span>
+    </div>`;
+  }).join('');
 
-  // Load all reference + pages JSONs in parallel
+  list.querySelectorAll('.history-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const id   = chip.dataset.id;
+      const item = sessionCache[id];
+      if (!item) return;
+      activeId = id;
+      updateSessionHistory(id);
+      render(item.refs, item.pagesData);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+}
+
+// ═══════════════════════════════════════════
+//  EXTRACT
+// ═══════════════════════════════════════════
+async function handleExtract() {
+  const url   = document.getElementById('url-input').value.trim();
+  const name  = document.getElementById('name-input').value.trim();
+  const useAi = document.getElementById('ai-toggle').checked;
+
+  if (!url) {
+    document.getElementById('url-input').focus();
+    return;
+  }
+
+  const btn = document.getElementById('extract-btn');
+  btn.disabled    = true;
+  btn.textContent = 'Extracting…';
+  showLoading('Extracting references…', 'This may take a few seconds for large PDFs');
+
+  try {
+    const formData = new FormData();
+    formData.append('url', url);
+
+    const params = new URLSearchParams();
+    if (useAi) params.set('use_ai', 'true');
+
+    const resp = await fetch(`${API_BASE}/extract?${params}`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!resp.ok) {
+      let detail = `HTTP ${resp.status} ${resp.statusText}`;
+      try { const j = await resp.json(); detail = j.detail || detail; } catch {}
+      throw new Error(detail);
+    }
+
+    const refs = await resp.json();
+
+    // Build a display name: user-supplied > document title > filename > url
+    const displayName = name
+      || refs.source_document.title
+      || refs.source_document.file_name
+      || url;
+
+    const id = `session_${Date.now()}`;
+    sessionCache[id] = { refs, pagesData: refs.pages_data || null, name: displayName };
+    sessionOrder.unshift(id);
+    activeId = id;
+
+    updateSessionHistory(id);
+    render(refs, refs.pages_data || null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Clear inputs for the next extraction
+    document.getElementById('url-input').value  = '';
+    document.getElementById('name-input').value = '';
+
+  } catch (err) {
+    let msg = String(err.message || err);
+    if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('Load failed')) {
+      msg = 'Could not reach the API server. Make sure it is running on port 8000.';
+    }
+    showError('Extraction failed', msg);
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = 'Extract References';
+  }
+}
+
+// Enter key in URL field triggers extract
+document.getElementById('url-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleExtract();
+});
+
+// ═══════════════════════════════════════════
+//  GOLDEN DATASET
+// ═══════════════════════════════════════════
+async function loadGoldenDataset() {
+  let manifest;
+  try {
+    const r = await fetch('/manifest.json');
+    if (!r.ok) return;
+    manifest = await r.json();
+  } catch {
+    return; // viewer served without the project root; golden mode will be empty
+  }
+
   const loaded = await Promise.all(manifest.map(async entry => {
     const id = entry.pdf_path.split('/').pop().replace('.pdf', '');
     try {
@@ -740,10 +1169,10 @@ async function init() {
   }));
 
   const valid = loaded.filter(Boolean);
-  const cache = Object.fromEntries(valid.map(v => [v.id, { refs: v.refs, pagesData: v.pagesData }]));
-  const sel   = document.getElementById('doc-sel');
+  const sel   = document.getElementById('golden-sel');
 
-  for (const { id, refs } of valid) {
+  for (const { id, refs, pagesData } of valid) {
+    goldenCache[id] = { refs, pagesData };
     const opt = document.createElement('option');
     opt.value = id;
     const t = refs.source_document.title || id;
@@ -754,32 +1183,28 @@ async function init() {
   sel.addEventListener('change', () => {
     const id = sel.value;
     hideTip();
-    document.getElementById('sidebar').innerHTML = '';
-    if (!id || !cache[id]) {
-      document.getElementById('text-panel').innerHTML = `
-        <div class="empty">
-          <div class="empty-icon">📄</div>
-          Select a SEBI circular above to explore its document references.
-          <div class="empty-sub">Five circulars available · hover any highlight for reference detail</div>
-        </div>`;
-      document.getElementById('meta-strip').classList.remove('on');
+    if (!id || !goldenCache[id]) {
+      showEmpty(
+        'Select a pre-analysed circular above to explore its references.',
+        'Five hand-labelled circulars · full document text · hover any highlight for detail'
+      );
       return;
     }
-    const { refs, pagesData } = cache[id];
+    activeId = id;
+    const { refs, pagesData } = goldenCache[id];
     render(refs, pagesData);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 }
 
-init().catch(err => {
-  console.error(err);
-  document.getElementById('text-panel').innerHTML = `
-    <div class="empty">
-      <div class="empty-icon">⚠️</div>
-      Could not load data. Make sure the server is running:<br>
-      <code style="font-family:monospace;font-size:12px">python3 viewer/serve.py</code>
-    </div>`;
-});
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+async function init() {
+  await loadGoldenDataset();
+}
+
+init().catch(err => console.warn('init error:', err));
 </script>
 </body>
 </html>

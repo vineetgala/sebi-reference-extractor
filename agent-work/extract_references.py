@@ -41,6 +41,15 @@ DATE_PATTERN = (
     r"|\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s+\d{4}"
 )
 
+# Detects a paragraph ending mid-date: "…December 3," (month + day + comma, no year yet).
+# Used by merge_split_paragraphs to rejoin lines that a PDF renderer wrapped across a line break.
+_PARTIAL_DATE_TAIL_RE = re.compile(
+    r"(?:January|February|March|April|May|June|July|August|September|"
+    r"October|November|December)\s+\d{1,2},$",
+    re.IGNORECASE,
+)
+_YEAR_HEAD_RE = re.compile(r"^\d{4}\b")
+
 CIRCULAR_NUMBER_RE = re.compile(r"\bCIRCULAR\s+([A-Z0-9/().-]+)\b")
 ISSUE_DATE_RE = re.compile(DATE_PATTERN, re.IGNORECASE)
 SUBJECT_RE = re.compile(r"\b(?:Sub|Subject)\s*:\s*(.+?)(?=\s+\d+\.\s|$)", re.IGNORECASE | re.DOTALL)
@@ -115,6 +124,32 @@ class DocumentRecord:
 
 def compact(text: str) -> str:
     return " ".join(text.translate(SMART_QUOTES).split())
+
+
+def merge_split_paragraphs(paragraphs: list[dict]) -> list[dict]:
+    """Merge consecutive paragraphs split by PDF line-wrapping mid-date.
+
+    When "...Master Circular for X dated December 3," falls on one physical
+    line and "2024 ..." on the next, the paragraph splitter creates two entries
+    and the date regex can't match. This pass joins such pairs so the regex
+    sees the complete date. The original ``structured`` data is never mutated.
+    """
+    out: list[dict] = []
+    i = 0
+    while i < len(paragraphs):
+        para = paragraphs[i]
+        text = compact(para.get("text", ""))
+        if _PARTIAL_DATE_TAIL_RE.search(text) and i + 1 < len(paragraphs):
+            next_text = compact(paragraphs[i + 1].get("text", ""))
+            if _YEAR_HEAD_RE.match(next_text):
+                merged = dict(para)
+                merged["text"] = text + " " + next_text
+                out.append(merged)
+                i += 2
+                continue
+        out.append(para)
+        i += 1
+    return out
 
 
 def clean_alias(text: str | None) -> str | None:
@@ -765,7 +800,7 @@ def analyze_document(pdf_path: Path, *, use_ai: bool = False, resolve_urls: bool
     mentions: list[dict] = []
 
     for page in structured["pages"]:
-        for paragraph in page["paragraphs"]:
+        for paragraph in merge_split_paragraphs(page["paragraphs"]):
             text = compact(paragraph["text"])
             if not text:
                 continue

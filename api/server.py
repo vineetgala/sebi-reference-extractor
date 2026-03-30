@@ -21,11 +21,12 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional, Union
 
 from fastapi import FastAPI, Form, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 # ── Add agent-work/ to sys.path so extract_references can be imported ──────
 _AGENT_WORK = Path(__file__).resolve().parent.parent / "agent-work"
@@ -223,6 +224,13 @@ class TargetLocators(BaseModel):
         description="Raw locator phrase(s) from the preceding text.",
         examples=[["para 13, 20, 22, 23 and Annexure-7, Annexure-15 and Annexure-20"]],
     )
+
+    @field_validator('raw', mode='before')
+    @classmethod
+    def coerce_raw_to_list(cls, v):
+        if isinstance(v, str):
+            return [v]
+        return v
     paragraphs: list[str] = Field(default=[], examples=[["13", "20", "22", "23"]])
     regulations: list[str] = Field(default=[], examples=[["101"]])
     sections: list[str] = Field(default=[], examples=[["11", "IV"]])
@@ -241,7 +249,7 @@ class ReferenceMention(BaseModel):
         description="Page in the *input PDF* where this reference appears (1-indexed).",
         examples=[1],
     )
-    source_paragraph_id: str = Field(examples=["p1.9"])
+    source_paragraph_id: Optional[str] = Field(default=None, examples=["p1.9"])
     match_texts: list[str] = Field(
         description="Exact text fragment(s) that triggered this reference detection.",
         examples=[["Master Circular for Registrars to an Issue and Share Transfer Agents"]],
@@ -281,6 +289,12 @@ class ExtractionResult(BaseModel):
     referenced_documents: list[ReferencedDocument]
     reference_mentions: list[ReferenceMention]
     summary: ExtractionSummary
+    pages_data: Optional[Any] = Field(
+        default=None,
+        description="Full page/paragraph structure of the source PDF, keyed as "
+                    "{pages: [{page_number, paragraphs: [{paragraph_id, text}]}]}. "
+                    "Allows viewers to render the complete document text with inline highlights.",
+    )
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -322,6 +336,14 @@ app = FastAPI(
 )
 
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+
+
 # ─── Routes ────────────────────────────────────────────────────────────────
 
 @app.get("/", include_in_schema=False)
@@ -342,7 +364,7 @@ def health():
     tags=["Extraction"],
     responses={
         200: {"description": "Extraction succeeded."},
-        400: {"description": "Bad input — no PDF found on page, missing AI key."},
+        400: {"description": "Bad input — invalid URL, no PDF found on page, or missing AI key."},
         422: {"description": "Validation error — missing required fields."},
         500: {"description": "Unexpected extraction failure."},
     },
@@ -421,6 +443,7 @@ def extract_references(
         result["source_document"]["source_pdf"] = source_ref
         result["source_document"]["file_name"]  = display_name
         result["source_document"]["source_url"] = submitted_url
+        result["pages_data"] = _structured
 
         return result
 

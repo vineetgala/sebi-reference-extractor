@@ -94,7 +94,7 @@ uvicorn api.server:app --reload --port 8000
 
 | URL | Description |
 |---|---|
-| `POST /extract` | Upload a PDF, get the full reference JSON back |
+| `POST /extract` | Submit a URL (SEBI webpage or direct PDF), get the full reference JSON back |
 | `GET /docs` | Swagger UI — interactive API explorer |
 | `GET /redoc` | ReDoc documentation |
 | `GET /health` | Health check |
@@ -110,14 +110,24 @@ Requires a `GEMINI_API_KEY` in `.env` only when `use_ai=true`. The extraction it
 
 ## Reference Viewer
 
-An interactive browser-based viewer that renders the extracted references in context — each paragraph containing a reference is shown with the referenced text highlighted inline, colour-coded by document type. Hovering any highlight shows a tooltip with the full reference detail: title, issuer, date, identifier, relation type, locators (section/para/annexure pointers), and a confidence bar. Clicking a document in the sidebar scrolls to its first mention.
+An interactive browser-based viewer with two modes:
+
+**Extract New tab (default)** — paste any SEBI circular webpage URL or direct PDF URL, give it an optional name, and click Extract. The viewer calls the local FastAPI server, runs the extraction pipeline, and renders results immediately. Previously extracted documents in the session are kept as clickable chips so you can switch between them without re-extracting.
+
+**Golden Dataset tab** — browse the 5 pre-analysed circulars from this project, loaded from the pre-computed `reference-output/` JSON files. Full document text is available in this mode.
+
+Both modes render identically: paragraphs with references are shown with inline highlights colour-coded by document type. Hovering a highlight shows a tooltip with title, issuer, date, identifier, relation type, locators (section/para/annexure pointers), and a confidence bar. Clicking a document in the sidebar scrolls to its first mention.
 
 ```bash
-python3 viewer/serve.py
-# → http://localhost:7890/viewer/
+# Both servers must be running for "Extract New" to work:
+python3 viewer/serve.py                           # viewer on port 7890
+uvicorn api.server:app --reload --port 8000       # API on port 8000
+
+# Then open:
+# http://localhost:7890/viewer/
 ```
 
-No dependencies beyond the Python standard library. The viewer reads `manifest.json` and the pre-generated `reference-output/*.references.json` files directly; run the extractor first if you haven't already.
+No build step. No frontend dependencies. The viewer server requires only the Python standard library.
 
 ---
 
@@ -164,8 +174,9 @@ evals/
 manifest.json                # source PDF metadata (URLs, paths, sizes)
 
 viewer/
-  index.html               # browser-based reference viewer (no build step)
-  serve.py                 # minimal stdlib HTTP server for the viewer
+  index.html               # general-purpose reference viewer — "Extract New" tab calls
+                           # the API on port 8000; "Golden Dataset" tab loads pre-computed JSONs
+  serve.py                 # minimal stdlib HTTP server; serves project root so paths resolve
 
 api/
   server.py                # FastAPI server — POST /extract, Swagger at /docs

@@ -30,6 +30,7 @@ pip install -r api/requirements.txt
 uvicorn api.server:app --reload --port 8000
 
 # Launch the reference viewer (open http://localhost:7890/viewer/)
+# For "Extract New" tab to work, ALSO run the API server below
 python3 viewer/serve.py
 
 # Convert extractor output → eval scorer format
@@ -75,7 +76,9 @@ api/
   requirements.txt         # fastapi, uvicorn, python-multipart
 
 viewer/
-  index.html               # browser-based reference viewer (pure HTML/CSS/JS, no build step)
+  index.html               # general-purpose reference viewer (pure HTML/CSS/JS, no build step)
+                           #   "Extract New" tab — enter any URL, calls FastAPI on port 8000
+                           #   "Golden Dataset" tab — browse the 5 pre-computed circulars
   serve.py                 # minimal stdlib HTTP server; serves project root so paths resolve
 
 manifest.json                # source PDF metadata (page URLs, PDF URLs, local paths, sizes)
@@ -207,8 +210,8 @@ Roughly prioritized:
 4. **Broader SEBI coverage** — run against the full SEBI archive for the knowledge graph scale story
 5. **Banking Regulation Act title normalization** — minor; fix singular/plural canonical for this specific act
 
-Already done: **Reference Viewer** (`viewer/`) — browser UI that renders each referenced paragraph with highlights and hover-cards.
-Already done: **API Server** (`api/server.py`) — FastAPI + Swagger; `POST /extract` accepts a PDF upload and returns the full reference JSON.
+Already done: **Reference Viewer** (`viewer/`) — general-purpose browser UI. "Extract New" tab accepts any SEBI URL, calls the FastAPI server on port 8000, and renders results live. "Golden Dataset" tab browses the 5 pre-computed circulars with full document text. Both modes share the same highlights + tooltip + sidebar rendering.
+Already done: **API Server** (`api/server.py`) — FastAPI + Swagger; `POST /extract` accepts a URL and returns the full reference JSON. CORS enabled so the viewer (port 7890) can call it directly from the browser.
 
 ---
 
@@ -230,6 +233,6 @@ Already done: **API Server** (`api/server.py`) — FastAPI + Swagger; `POST /ext
 - [x] AI discovery via Gemini 2.5 Flash (finds references regex missed)
 - [x] Complete run instructions in README.md
 - [x] Reference Viewer — browser UI with inline highlights and hover-cards
-- [x] API Server — FastAPI + Swagger UI, POST /extract accepts PDF upload
+- [x] API Server — FastAPI + Swagger UI, POST /extract accepts a URL (SEBI webpage or direct PDF)
 - [ ] Public GitHub repo (push when ready)
 - [ ] 2-minute video covering: models/tools used, extraction approach, eval methodology, limitations, v2 scale story
