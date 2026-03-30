@@ -1,0 +1,627 @@
+{
+  "schema_version": "1.0.0",
+  "extraction_method": {
+    "mode": "deterministic",
+    "layout_parser": "pdfminer + pypdf via structured_pdf_extract.py",
+    "llm_used": false
+  },
+  "source_document": {
+    "source_pdf": "pdfs/1772622419912.pdf",
+    "file_name": "1772622419912.pdf",
+    "page_count": 10,
+    "circular_number": "HO/19/(1)2025-AFD-FPICELL/I/5928/2026",
+    "issue_date": "March 04, 2026",
+    "title": "Guidelines for Custodians"
+  },
+  "ai_enrichment": {
+    "enabled": false,
+    "provider": null,
+    "model": null,
+    "reviewed_document_ids": [],
+    "changes_applied": 0
+  },
+  "referenced_documents": [
+    {
+      "document_id": "doc_001",
+      "document_type": "regulations",
+      "title": "SEBI (Custodian) Regulations, 1996",
+      "short_title": null,
+      "descriptive_title": null,
+      "descriptive_title_source": null,
+      "identifier": null,
+      "date": null,
+      "year": 1996,
+      "issuing_body": "SEBI",
+      "aliases": [
+        "Custodian Regulations"
+      ],
+      "title_source": "explicit_in_text",
+      "ai_review_notes": null,
+      "resolution_status": "unresolved",
+      "resolved_url": null
+    },
+    {
+      "document_id": "doc_002",
+      "document_type": "notification",
+      "title": "Notification",
+      "short_title": "Notification",
+      "descriptive_title": null,
+      "descriptive_title_source": null,
+      "identifier": null,
+      "date": "September 18, 2025",
+      "year": 2025,
+      "issuing_body": "SEBI",
+      "aliases": [],
+      "title_source": "generic_only",
+      "ai_review_notes": null,
+      "resolution_status": "unresolved",
+      "resolved_url": null
+    },
+    {
+      "document_id": "doc_003",
+      "document_type": "act",
+      "title": "Banking Regulations Act, 1949",
+      "short_title": null,
+      "descriptive_title": null,
+      "descriptive_title_source": null,
+      "identifier": null,
+      "date": null,
+      "year": 1949,
+      "issuing_body": null,
+      "aliases": [],
+      "title_source": "explicit_in_text",
+      "ai_review_notes": null,
+      "resolution_status": "unresolved",
+      "resolved_url": null
+    },
+    {
+      "document_id": "doc_004",
+      "document_type": "circular",
+      "title": null,
+      "short_title": "SEBI Circular CIR/MIRSD/5/2013",
+      "descriptive_title": null,
+      "descriptive_title_source": null,
+      "identifier": "CIR/MIRSD/5/2013",
+      "date": "August 27, 2013",
+      "year": 2013,
+      "issuing_body": "SEBI",
+      "aliases": [],
+      "title_source": "not_present_in_text",
+      "ai_review_notes": null,
+      "resolution_status": "unresolved",
+      "resolved_url": null
+    },
+    {
+      "document_id": "doc_005",
+      "document_type": "circular",
+      "title": null,
+      "short_title": "SEBI Circular CIR/MIRSD/24/2011",
+      "descriptive_title": null,
+      "descriptive_title_source": null,
+      "identifier": "CIR/MIRSD/24/2011",
+      "date": "15 Dec 2011",
+      "year": 2011,
+      "issuing_body": "SEBI",
+      "aliases": [],
+      "title_source": "not_present_in_text",
+      "ai_review_notes": null,
+      "resolution_status": "unresolved",
+      "resolved_url": null
+    },
+    {
+      "document_id": "doc_006",
+      "document_type": "master_circular",
+      "title": "Master Circular for Custodians",
+      "short_title": "Custodian Master Circular",
+      "descriptive_title": null,
+      "descriptive_title_source": null,
+      "identifier": null,
+      "date": "May 10, 2024",
+      "year": 2024,
+      "issuing_body": "SEBI",
+      "aliases": [
+        "Custodian Master Circular",
+        "Master Circular"
+      ],
+      "title_source": "explicit_in_text",
+      "ai_review_notes": null,
+      "resolution_status": "unresolved",
+      "resolved_url": null
+    },
+    {
+      "document_id": "doc_007",
+      "document_type": "notification",
+      "title": "Gazette Notification",
+      "short_title": "Gazette Notification",
+      "descriptive_title": null,
+      "descriptive_title_source": null,
+      "identifier": null,
+      "date": "September 18, 2025",
+      "year": 2025,
+      "issuing_body": "SEBI",
+      "aliases": [],
+      "title_source": "generic_only",
+      "ai_review_notes": null,
+      "resolution_status": "unresolved",
+      "resolved_url": null
+    },
+    {
+      "document_id": "doc_008",
+      "document_type": "act",
+      "title": "Securities and Exchange Board of India Act, 1992",
+      "short_title": null,
+      "descriptive_title": null,
+      "descriptive_title_source": null,
+      "identifier": null,
+      "date": null,
+      "year": 1992,
+      "issuing_body": null,
+      "aliases": [],
+      "title_source": "explicit_in_text",
+      "ai_review_notes": null,
+      "resolution_status": "unresolved",
+      "resolved_url": null
+    }
+  ],
+  "reference_mentions": [
+    {
+      "document_id": "doc_001",
+      "source_page": 1,
+      "source_paragraph_id": "p1.6",
+      "match_texts": [
+        "Custodian Regulations",
+        "SEBI (Custodian) Regulations, 1996"
+      ],
+      "evidence_text": "1. SEBI (Custodian) Regulations, 1996 (Custodian Regulations) were amended vide notification dated September 18, 2025. The amendment notification, inter alia, specified provisions related to net worth, rendering of financial services, obligations and responsibilities for Custodian. In this context, the specific conditions and modalities with respect to various provisions pertaining to Custodians are being prescribed by way of this Circular.",
+      "relation_type": "relies_on",
+      "target_locators": {
+        "raw": null,
+        "paragraphs": [],
+        "regulations": [],
+        "sections": [],
+        "chapters": [],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.93,
+      "confidence_label": "high",
+      "confidence_reason": "Full formal title and year are present in the source paragraph.",
+      "mention_id": "ref_001"
+    },
+    {
+      "document_id": "doc_002",
+      "source_page": 1,
+      "source_paragraph_id": "p1.6",
+      "match_texts": [
+        "notification dated September 18, 2025"
+      ],
+      "evidence_text": "1. SEBI (Custodian) Regulations, 1996 (Custodian Regulations) were amended vide notification dated September 18, 2025. The amendment notification, inter alia, specified provisions related to net worth, rendering of financial services, obligations and responsibilities for Custodian. In this context, the specific conditions and modalities with respect to various provisions pertaining to Custodians are being prescribed by way of this Circular.",
+      "relation_type": "relies_on",
+      "target_locators": {
+        "raw": null,
+        "paragraphs": [],
+        "regulations": [],
+        "sections": [],
+        "chapters": [],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.68,
+      "confidence_label": "medium",
+      "confidence_reason": "Notification date is present, but title and identifier are absent.",
+      "mention_id": "ref_002"
+    },
+    {
+      "document_id": "doc_001",
+      "source_page": 1,
+      "source_paragraph_id": "p1.8",
+      "match_texts": [
+        "Custodian Regulations"
+      ],
+      "evidence_text": "2.1. Regulation 9 (f) of Custodian Regulations specifies as under:",
+      "relation_type": "quotes_or_cites",
+      "target_locators": {
+        "raw": [
+          "Regulation 9 (f)"
+        ],
+        "paragraphs": [],
+        "regulations": [
+          "9(f"
+        ],
+        "sections": [],
+        "chapters": [],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.74,
+      "confidence_label": "medium",
+      "confidence_reason": "Alias-only mention resolved from an earlier full-form citation in the same PDF.",
+      "mention_id": "ref_003"
+    },
+    {
+      "document_id": "doc_003",
+      "source_page": 1,
+      "source_paragraph_id": "p1.13",
+      "match_texts": [
+        "Banking Regulations Act, 1949"
+      ],
+      "evidence_text": "Provided that a custodian who is not a banking company as defined under the Banking Regulations Act, 1949 or a subsidiary/associate/joint venture of such banking company may render such financial services subject to conditions as may be specified by the Board.\"",
+      "relation_type": "references",
+      "target_locators": {
+        "raw": null,
+        "paragraphs": [],
+        "regulations": [],
+        "sections": [],
+        "chapters": [],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.93,
+      "confidence_label": "high",
+      "confidence_reason": "Full formal title and year are present in the source paragraph.",
+      "mention_id": "ref_004"
+    },
+    {
+      "document_id": "doc_001",
+      "source_page": 2,
+      "source_paragraph_id": "p2.2",
+      "match_texts": [
+        "Custodian Regulations"
+      ],
+      "evidence_text": "2.1.1. The list of activities relating to rendering of financial services that can be carried out by a Custodian, in terms of the certificate granted under the Custodian Regulations shall be specified through the Custodians and DDPs Standards Setting Forum ('CDSSF'), in consultation with SEBI.",
+      "relation_type": "relies_on",
+      "target_locators": {
+        "raw": null,
+        "paragraphs": [],
+        "regulations": [],
+        "sections": [],
+        "chapters": [],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.74,
+      "confidence_label": "medium",
+      "confidence_reason": "Alias-only mention resolved from an earlier full-form citation in the same PDF.",
+      "mention_id": "ref_005"
+    },
+    {
+      "document_id": "doc_001",
+      "source_page": 2,
+      "source_paragraph_id": "p2.7",
+      "match_texts": [
+        "Custodian Regulations"
+      ],
+      "evidence_text": "2.2. The requirements of clauses (i) and (ii) of Regulation 13 of Custodian Regulations shall not apply to a Custodian subject to such conditions as may be specified by SEBI. Accordingly, a Custodian may share manpower resources, infrastructure and systems across other financial services activities undertaken by it, subject to the following conditions:",
+      "relation_type": "references",
+      "target_locators": {
+        "raw": [
+          "clauses (i) and (ii) of Regulation 13"
+        ],
+        "paragraphs": [],
+        "regulations": [
+          "13"
+        ],
+        "sections": [],
+        "chapters": [],
+        "annexures": [],
+        "clauses": [
+          "i",
+          "ii"
+        ]
+      },
+      "confidence": 0.74,
+      "confidence_label": "medium",
+      "confidence_reason": "Alias-only mention resolved from an earlier full-form citation in the same PDF.",
+      "mention_id": "ref_006"
+    },
+    {
+      "document_id": "doc_001",
+      "source_page": 2,
+      "source_paragraph_id": "p2.8",
+      "match_texts": [
+        "Custodian Regulations",
+        "SEBI (Custodian) Regulations, 1996"
+      ],
+      "evidence_text": "1In terms of Regulation 7(1) of SEBI (Custodian) Regulations, 1996, Custodian shall fulfill the net worth requirements under Custodian Regulations, separately and independently, of the capital adequacy requirements, if any, for each activity undertaken by it under the relevant regulations.",
+      "relation_type": "relies_on",
+      "target_locators": {
+        "raw": [
+          "Regulation 7(1)"
+        ],
+        "paragraphs": [],
+        "regulations": [
+          "7(1"
+        ],
+        "sections": [],
+        "chapters": [],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.93,
+      "confidence_label": "high",
+      "confidence_reason": "Full formal title and year are present in the source paragraph.",
+      "mention_id": "ref_007"
+    },
+    {
+      "document_id": "doc_004",
+      "source_page": 3,
+      "source_paragraph_id": "p3.2",
+      "match_texts": [
+        "SEBI Circular no. CIR/MIRSD/5/2013 dated August 27, 2013"
+      ],
+      "evidence_text": "2.2.2. Custodian shall continue to adhere to general guidelines as specified in SEBI Circular no. CIR/MIRSD/5/2013 dated August 27, 2013 for dealing with conflict of interest.",
+      "relation_type": "references",
+      "target_locators": {
+        "raw": null,
+        "paragraphs": [],
+        "regulations": [],
+        "sections": [],
+        "chapters": [],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.91,
+      "confidence_label": "high",
+      "confidence_reason": "SEBI circular identifier is present in the source paragraph.",
+      "mention_id": "ref_008"
+    },
+    {
+      "document_id": "doc_005",
+      "source_page": 3,
+      "source_paragraph_id": "p3.4",
+      "match_texts": [
+        "SEBI Circular CIR/MIRSD/24/2011 dated 15 Dec 2011"
+      ],
+      "evidence_text": "3.1. In terms of SEBI Circular CIR/MIRSD/24/2011 dated 15 Dec 2011, the registered intermediaries including Custodians are allowed to outsource non- core activities. The Intermediaries, however, cannot outsource their core business activities and compliance functions.",
+      "relation_type": "relies_on",
+      "target_locators": {
+        "raw": null,
+        "paragraphs": [],
+        "regulations": [],
+        "sections": [],
+        "chapters": [],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.91,
+      "confidence_label": "high",
+      "confidence_reason": "SEBI circular identifier is present in the source paragraph.",
+      "mention_id": "ref_009"
+    },
+    {
+      "document_id": "doc_006",
+      "source_page": 3,
+      "source_paragraph_id": "p3.7",
+      "match_texts": [
+        "SEBI's Master Circular dated May 10, 2024 for Custodians (Custodian Master Circular)"
+      ],
+      "evidence_text": "4.1. Chapter III of SEBI's Master Circular dated May 10, 2024 for Custodians (Custodian Master Circular) provides specifications of vaults with Custodians.",
+      "relation_type": "quotes_or_cites",
+      "target_locators": {
+        "raw": [
+          "Chapter III"
+        ],
+        "paragraphs": [],
+        "regulations": [],
+        "sections": [],
+        "chapters": [
+          "III"
+        ],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.92,
+      "confidence_label": "high",
+      "confidence_reason": "Full master circular title and issue date are present in the source paragraph.",
+      "mention_id": "ref_010"
+    },
+    {
+      "document_id": "doc_006",
+      "source_page": 3,
+      "source_paragraph_id": "p3.8",
+      "match_texts": [
+        "Custodian Master Circular"
+      ],
+      "evidence_text": "4.2. To facilitate ease of doing business for Custodians, provisions of the said Chapter III of the Custodian Master Circular stand replaced with the following:",
+      "relation_type": "amends_or_modifies",
+      "target_locators": {
+        "raw": [
+          "Chapter III"
+        ],
+        "paragraphs": [],
+        "regulations": [],
+        "sections": [],
+        "chapters": [
+          "III"
+        ],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.74,
+      "confidence_label": "medium",
+      "confidence_reason": "Alias-only mention resolved from an earlier full-form citation in the same PDF.",
+      "mention_id": "ref_011"
+    },
+    {
+      "document_id": "doc_001",
+      "source_page": 4,
+      "source_paragraph_id": "p4.2",
+      "match_texts": [
+        "Custodian Regulations"
+      ],
+      "evidence_text": "5. Obligations and Responsibilities In order to further strengthen the compliance and governance framework for Custodians, SEBI vide Gazette notification dated September 18, 2025, inter alia, inserted Regulation 19B in the Custodian Regulations, mandating certain obligations and responsibilities. Accordingly, the following are specified:",
+      "relation_type": "relies_on",
+      "target_locators": {
+        "raw": null,
+        "paragraphs": [],
+        "regulations": [],
+        "sections": [],
+        "chapters": [],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.74,
+      "confidence_label": "medium",
+      "confidence_reason": "Alias-only mention resolved from an earlier full-form citation in the same PDF.",
+      "mention_id": "ref_012"
+    },
+    {
+      "document_id": "doc_007",
+      "source_page": 4,
+      "source_paragraph_id": "p4.2",
+      "match_texts": [
+        "Gazette notification dated September 18, 2025"
+      ],
+      "evidence_text": "5. Obligations and Responsibilities In order to further strengthen the compliance and governance framework for Custodians, SEBI vide Gazette notification dated September 18, 2025, inter alia, inserted Regulation 19B in the Custodian Regulations, mandating certain obligations and responsibilities. Accordingly, the following are specified:",
+      "relation_type": "relies_on",
+      "target_locators": {
+        "raw": null,
+        "paragraphs": [],
+        "regulations": [],
+        "sections": [],
+        "chapters": [],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.68,
+      "confidence_label": "medium",
+      "confidence_reason": "Notification date is present, but title and identifier are absent.",
+      "mention_id": "ref_013"
+    },
+    {
+      "document_id": "doc_001",
+      "source_page": 4,
+      "source_paragraph_id": "p4.6",
+      "match_texts": [
+        "Custodian Regulations"
+      ],
+      "evidence_text": "5.1.2. Custodian which is a bank or subsidiary/ associate/ joint venture of a bank, may not be required to formulate separate specific committees for custody business/function and may rely on the bank wide or organization wide policies, committees, governance structures that apply across all functions of the bank, including the custodian business. However, where Custodian Regulations prescribe any additional requirements, the Custodian shall ensure that such requirements are appropriately incorporated within the relevant bank wide policies or through supplementary procedures, as necessary.",
+      "relation_type": "references",
+      "target_locators": {
+        "raw": null,
+        "paragraphs": [],
+        "regulations": [],
+        "sections": [],
+        "chapters": [],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.74,
+      "confidence_label": "medium",
+      "confidence_reason": "Alias-only mention resolved from an earlier full-form citation in the same PDF.",
+      "mention_id": "ref_014"
+    },
+    {
+      "document_id": "doc_006",
+      "source_page": 9,
+      "source_paragraph_id": "p9.3",
+      "match_texts": [
+        "Custodian Master Circular"
+      ],
+      "evidence_text": "6.1. Custodian Master Circular has, inter alia, specified various reporting",
+      "relation_type": "references",
+      "target_locators": {
+        "raw": null,
+        "paragraphs": [],
+        "regulations": [],
+        "sections": [],
+        "chapters": [],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.74,
+      "confidence_label": "medium",
+      "confidence_reason": "Alias-only mention resolved from an earlier full-form citation in the same PDF.",
+      "mention_id": "ref_015"
+    },
+    {
+      "document_id": "doc_006",
+      "source_page": 9,
+      "source_paragraph_id": "p9.4",
+      "match_texts": [
+        "Custodian Master Circular"
+      ],
+      "evidence_text": "requirements for Custodians under Chapter IV of the Custodian Master Circular.",
+      "relation_type": "references",
+      "target_locators": {
+        "raw": [
+          "Chapter IV"
+        ],
+        "paragraphs": [],
+        "regulations": [],
+        "sections": [],
+        "chapters": [
+          "IV"
+        ],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.74,
+      "confidence_label": "medium",
+      "confidence_reason": "Alias-only mention resolved from an earlier full-form citation in the same PDF.",
+      "mention_id": "ref_016"
+    },
+    {
+      "document_id": "doc_008",
+      "source_page": 10,
+      "source_paragraph_id": "p10.1",
+      "match_texts": [
+        "Securities and Exchange Board of India Act, 1992"
+      ],
+      "evidence_text": "8. This Circular is issued in exercise of the powers conferred under Section 11(1) of the Securities and Exchange Board of India Act, 1992 read with Regulations 9(f),",
+      "relation_type": "legal_basis",
+      "target_locators": {
+        "raw": [
+          "Section 11(1)"
+        ],
+        "paragraphs": [],
+        "regulations": [],
+        "sections": [
+          "11(1"
+        ],
+        "chapters": [],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.93,
+      "confidence_label": "high",
+      "confidence_reason": "Full formal title and year are present in the source paragraph.",
+      "mention_id": "ref_017"
+    },
+    {
+      "document_id": "doc_001",
+      "source_page": 10,
+      "source_paragraph_id": "p10.2",
+      "match_texts": [
+        "SEBI (Custodian) Regulations, 1996"
+      ],
+      "evidence_text": "13 and 19B of SEBI (Custodian) Regulations, 1996 to protect the interest of investors in securities and to promote the development of, and to regulate the securities market.",
+      "relation_type": "references",
+      "target_locators": {
+        "raw": null,
+        "paragraphs": [],
+        "regulations": [],
+        "sections": [],
+        "chapters": [],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.93,
+      "confidence_label": "high",
+      "confidence_reason": "Full formal title and year are present in the source paragraph.",
+      "mention_id": "ref_018"
+    }
+  ],
+  "summary": {
+    "referenced_document_count": 8,
+    "reference_mention_count": 18,
+    "pages_with_references": [
+      1,
+      2,
+      3,
+      4,
+      9,
+      10
+    ]
+  }
+}

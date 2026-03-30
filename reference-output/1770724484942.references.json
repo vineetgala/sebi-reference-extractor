@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0.0",
+  "extraction_method": {
+    "mode": "deterministic",
+    "layout_parser": "pdfminer + pypdf via structured_pdf_extract.py",
+    "llm_used": false
+  },
+  "source_document": {
+    "source_pdf": "pdfs/1770724484942.pdf",
+    "file_name": "1770724484942.pdf",
+    "page_count": 4,
+    "circular_number": "SEBI/HO/DDHS/DDHS-",
+    "issue_date": null,
+    "title": "Obligations on CRAs while undertaking rating of financial instruments falling under the purview of any other Financial Sector Regulator"
+  },
+  "ai_enrichment": {
+    "enabled": false,
+    "provider": null,
+    "model": null,
+    "reviewed_document_ids": [],
+    "changes_applied": 0
+  },
+  "referenced_documents": [
+    {
+      "document_id": "doc_001",
+      "document_type": "act",
+      "title": "Securities and Exchange Board of India Act, 1992",
+      "short_title": null,
+      "descriptive_title": null,
+      "descriptive_title_source": null,
+      "identifier": null,
+      "date": null,
+      "year": 1992,
+      "issuing_body": null,
+      "aliases": [],
+      "title_source": "explicit_in_text",
+      "ai_review_notes": null,
+      "resolution_status": "unresolved",
+      "resolved_url": null
+    }
+  ],
+  "reference_mentions": [
+    {
+      "document_id": "doc_001",
+      "source_page": 4,
+      "source_paragraph_id": "p4.6",
+      "match_texts": [
+        "Securities and Exchange Board of India Act, 1992"
+      ],
+      "evidence_text": "4. This circular is issued with the approval of competent authority, in exercise of the powers conferred by Section 11 (1) of Securities and Exchange Board of India Act, 1992 read with the provisions of Regulation 20 of CRA Regulations to protect the interest of investors in securities and to promote the development of, and to regulate, the securities market.",
+      "relation_type": "legal_basis",
+      "target_locators": {
+        "raw": [
+          "Section 11 (1)"
+        ],
+        "paragraphs": [],
+        "regulations": [],
+        "sections": [
+          "11(1"
+        ],
+        "chapters": [],
+        "annexures": [],
+        "clauses": []
+      },
+      "confidence": 0.93,
+      "confidence_label": "high",
+      "confidence_reason": "Full formal title and year are present in the source paragraph.",
+      "mention_id": "ref_001"
+    }
+  ],
+  "summary": {
+    "referenced_document_count": 1,
+    "reference_mention_count": 1,
+    "pages_with_references": [
+      4
+    ]
+  }
+}

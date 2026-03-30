@@ -1,0 +1,66 @@
+{
+  "fixture_id": "valuation_of_gold_and_silver",
+  "source_pdf": "pdfs/1772102397057.pdf",
+  "source_title": "Valuation of physical Gold and Silver held by mutual fund schemes",
+  "source_page_url": "https://www.sebi.gov.in/legal/circulars/feb-2026/valuation-of-physical-gold-and-silver-held-by-mutual-fund-schemes_100001.html",
+  "scored_references": [
+    {
+      "canonical_key": "sebi_mutual_funds_regulations_2026",
+      "document_type": "regulations",
+      "canonical_title": "SEBI (Mutual Funds) Regulations, 2026",
+      "aliases": [
+        "SEBI (Mutual Funds) Regulations, 2026"
+      ],
+      "official_identifier": null,
+      "date": "2026",
+      "source_pages": [1],
+      "evidence": [
+        {
+          "page": 1,
+          "text": "SEBI has notified SEBI (Mutual Funds) Regulations, 2026 vide notification no. LAD-NRO/GN/2026/294 dated January 14, 2026."
+        },
+        {
+          "page": 1,
+          "text": "Seventh Schedule of SEBI (Mutual Funds) Regulations, 2026."
+        }
+      ],
+      "resolved_url": null,
+      "notes": "The notification identifier is supporting metadata for this regulations mention, not a separately scored untitled notification object."
+    },
+    {
+      "canonical_key": "sebi_mutual_funds_regulations_1996",
+      "document_type": "regulations",
+      "canonical_title": "SEBI (Mutual Funds) Regulations, 1996",
+      "aliases": [
+        "SEBI (Mutual Funds) Regulations, 1996"
+      ],
+      "official_identifier": null,
+      "date": "1996",
+      "source_pages": [2],
+      "evidence": [
+        {
+          "page": 2,
+          "text": "Regulation 77 of SEBI (Mutual Funds) Regulations, 1996."
+        }
+      ],
+      "resolved_url": null
+    }
+  ],
+  "abstain_mentions": [
+    {
+      "page": 2,
+      "text": "spot polling guidelines as specified by SEBI from time to time",
+      "reason": "Generic future guidance, not a specific document."
+    },
+    {
+      "page": 2,
+      "text": "This Circular",
+      "reason": "Self-reference to the source document."
+    },
+    {
+      "page": 2,
+      "text": "Section 11(1) of the Securities and Exchange ...",
+      "reason": "The extracted text truncates the act title, so this mention is excluded from primary scoring in the current dataset."
+    }
+  ]
+}

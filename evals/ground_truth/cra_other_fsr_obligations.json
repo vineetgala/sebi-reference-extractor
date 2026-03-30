@@ -1,0 +1,70 @@
+{
+  "fixture_id": "cra_other_fsr_obligations",
+  "source_pdf": "pdfs/1770724484942.pdf",
+  "source_title": "Obligations on CRAs while rating instruments under other financial sector regulators",
+  "source_page_url": "https://www.sebi.gov.in/legal/circulars/feb-2026/obligations-on-cras-while-undertaking-rating-of-financial-instruments-falling-under-the-purview-of-any-other-financial-sector-regulator_99670.html",
+  "scored_references": [
+    {
+      "canonical_key": "sebi_cra_regulations_1999",
+      "document_type": "regulations",
+      "canonical_title": "SEBI (Credit Rating Agencies) Regulations, 1999",
+      "aliases": [
+        "SEBI (Credit Rating Agencies) Regulation, 1999",
+        "SEBI (Credit Rating Agencies) Regulations, 1999",
+        "CRA Regulations"
+      ],
+      "official_identifier": null,
+      "date": "1999",
+      "source_pages": [1, 2, 3, 4],
+      "evidence": [
+        {
+          "page": 1,
+          "text": "Regulation 9(f) of the SEBI (Credit Rating Agencies) Regulation, 1999."
+        },
+        {
+          "page": 2,
+          "text": "Specified under the CRA Regulations."
+        },
+        {
+          "page": 3,
+          "text": "Confirming compliance with the requirements of CRA Regulations."
+        },
+        {
+          "page": 4,
+          "text": "Regulation 20 of CRA Regulations."
+        }
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_key": "sebi_act_1992",
+      "document_type": "act",
+      "canonical_title": "Securities and Exchange Board of India Act, 1992",
+      "aliases": [
+        "Securities and Exchange Board of India Act, 1992"
+      ],
+      "official_identifier": null,
+      "date": "1992",
+      "source_pages": [4],
+      "evidence": [
+        {
+          "page": 4,
+          "text": "Section 11(1) of Securities and Exchange Board of India Act, 1992."
+        }
+      ],
+      "resolved_url": null
+    }
+  ],
+  "abstain_mentions": [
+    {
+      "page": 4,
+      "text": "circulars issued in this regard",
+      "reason": "Too generic for stable primary scoring; precision-first systems should avoid forced resolution."
+    },
+    {
+      "page": 4,
+      "text": "This Circular",
+      "reason": "Self-reference to the source document."
+    }
+  ]
+}

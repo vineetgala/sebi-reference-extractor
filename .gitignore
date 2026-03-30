@@ -1,0 +1,12 @@
+.DS_Store
+*.pyc
+*.pyo
+__pycache__/
+
+.env
+.env.*
+
+.claude/
+tmp/
+
+structured-output/

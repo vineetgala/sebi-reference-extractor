@@ -1,0 +1,101 @@
+{
+  "fixture_id": "stock_broker_reporting_relaxations",
+  "source_pdf": "pdfs/1774264133189.pdf",
+  "source_title": "Relaxations in certain reporting requirements for certain Stock Brokers",
+  "source_page_url": "https://www.sebi.gov.in/legal/circulars/mar-2026/ease-of-doing-business-measures-relaxations-in-certain-reporting-requirements-for-certain-stock-brokers-and-doing-away-with-the-requirement-of-reporting-of-demat-account_100511.html",
+  "scored_references": [
+    {
+      "canonical_key": "master_circular_stock_brokers_2025_06_17",
+      "document_type": "master_circular",
+      "canonical_title": "Master Circular for Stock Brokers",
+      "aliases": [
+        "Master Circular for Stock Brokers dated June 17, 2025",
+        "Master Circular"
+      ],
+      "official_identifier": null,
+      "date": "2025-06-17",
+      "source_pages": [1, 2, 3],
+      "evidence": [
+        {
+          "page": 1,
+          "text": "Master Circular for Stock Brokers dated June 17, 2025."
+        },
+        {
+          "page": 2,
+          "text": "Modify the relevant paras in Master Circular as under."
+        },
+        {
+          "page": 3,
+          "text": "Paras 15.3 and 15.4 of Master Circular for Stock Brokers dated June 17, 2025."
+        }
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_key": "sebi_act_1992",
+      "document_type": "act",
+      "canonical_title": "Securities and Exchange Board of India Act, 1992",
+      "aliases": [
+        "Securities and Exchange Board of India Act, 1992"
+      ],
+      "official_identifier": null,
+      "date": "1992",
+      "source_pages": [4],
+      "evidence": [
+        {
+          "page": 4,
+          "text": "Section 11(1) of Chapter IV of the Securities and Exchange Board of India Act, 1992."
+        }
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_key": "depositories_act_1996",
+      "document_type": "act",
+      "canonical_title": "Depositories Act, 1996",
+      "aliases": [
+        "Depositories Act, 1996"
+      ],
+      "official_identifier": null,
+      "date": "1996",
+      "source_pages": [4],
+      "evidence": [
+        {
+          "page": 4,
+          "text": "Section 19 of Chapter IV of the Depositories Act, 1996."
+        }
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_key": "sccr_stock_exchange_cc_regulations_2018",
+      "document_type": "regulations",
+      "canonical_title": "Securities Contracts (Regulation) (Stock Exchanges and Clearing Corporations) Regulations, 2018",
+      "aliases": [
+        "Securities Contracts (Regulation) (Stock Exchanges and Clearing Corporations) Regulations, 2018"
+      ],
+      "official_identifier": null,
+      "date": "2018",
+      "source_pages": [4],
+      "evidence": [
+        {
+          "page": 4,
+          "text": "Regulation 51 of Securities Contracts (Regulation) (Stock Exchanges and Clearing Corporations) Regulations, 2018."
+        }
+      ],
+      "resolved_url": null
+    }
+  ],
+  "abstain_mentions": [
+    {
+      "page": 4,
+      "text": "relevant Bye-laws, Rules and Regulations",
+      "reason": "Generic and non-specific; should not be forced into a single resolved document."
+    },
+    {
+      "page": 4,
+      "text": "this circular",
+      "reason": "Self-reference to the source document."
+    }
+  ]
+}

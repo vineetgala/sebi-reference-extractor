@@ -1,0 +1,42 @@
+[
+  {
+    "fixture_id": "ease_of_doing_investment_loc",
+    "source_pdf": "pdfs/1769773760624.pdf",
+    "source_page_url": "https://www.sebi.gov.in/legal/circulars/jan-2026/ease-of-doing-investment-and-ease-of-doing-business-doing-away-with-requirement-of-issuance-of-letter-of-confirmation-loc-and-to-effect-direct-credit-of-securities-in-dematerialisation-account-o-_99421.html",
+    "source_title": "Ease of Doing Investment and Ease of Doing Business - direct credit of securities and LOC removal",
+    "page_count": 6,
+    "challenge_tags": ["master-circular", "acts", "regulations", "later-page-authority-paragraph"]
+  },
+  {
+    "fixture_id": "cra_other_fsr_obligations",
+    "source_pdf": "pdfs/1770724484942.pdf",
+    "source_page_url": "https://www.sebi.gov.in/legal/circulars/feb-2026/obligations-on-cras-while-undertaking-rating-of-financial-instruments-falling-under-the-purview-of-any-other-financial-sector-regulator_99670.html",
+    "source_title": "Obligations on CRAs while rating instruments under other financial sector regulators",
+    "page_count": 4,
+    "challenge_tags": ["alias-normalization", "repeated-shorthand", "generic-circular-abstention"]
+  },
+  {
+    "fixture_id": "valuation_of_gold_and_silver",
+    "source_pdf": "pdfs/1772102397057.pdf",
+    "source_page_url": "https://www.sebi.gov.in/legal/circulars/feb-2026/valuation-of-physical-gold-and-silver-held-by-mutual-fund-schemes_100001.html",
+    "source_title": "Valuation of physical Gold and Silver held by mutual fund schemes",
+    "page_count": 2,
+    "challenge_tags": ["short-doc", "low-reference-count", "avoid-over-extraction"]
+  },
+  {
+    "fixture_id": "guidelines_for_custodians",
+    "source_pdf": "pdfs/1772622419912.pdf",
+    "source_page_url": "https://www.sebi.gov.in/legal/circulars/mar-2026/guidelines-for-custodians_100118.html",
+    "source_title": "Guidelines for Custodians",
+    "page_count": 10,
+    "challenge_tags": ["identifier-only-circulars", "master-circular", "repeated-shorthand", "abstention-cases"]
+  },
+  {
+    "fixture_id": "stock_broker_reporting_relaxations",
+    "source_pdf": "pdfs/1774264133189.pdf",
+    "source_page_url": "https://www.sebi.gov.in/legal/circulars/mar-2026/ease-of-doing-business-measures-relaxations-in-certain-reporting-requirements-for-certain-stock-brokers-and-doing-away-with-the-requirement-of-reporting-of-demat-account_100511.html",
+    "source_title": "Relaxations in certain reporting requirements for certain Stock Brokers",
+    "page_count": 4,
+    "challenge_tags": ["master-circular", "repeated-cross-page-mentions", "acts", "regulations"]
+  }
+]

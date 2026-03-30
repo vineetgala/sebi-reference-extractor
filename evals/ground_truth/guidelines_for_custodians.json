@@ -1,0 +1,160 @@
+{
+  "fixture_id": "guidelines_for_custodians",
+  "source_pdf": "pdfs/1772622419912.pdf",
+  "source_title": "Guidelines for Custodians",
+  "source_page_url": "https://www.sebi.gov.in/legal/circulars/mar-2026/guidelines-for-custodians_100118.html",
+  "scored_references": [
+    {
+      "canonical_key": "sebi_custodian_regulations_1996",
+      "document_type": "regulations",
+      "canonical_title": "SEBI (Custodian) Regulations, 1996",
+      "aliases": [
+        "SEBI (Custodian) Regulations, 1996",
+        "Custodian Regulations"
+      ],
+      "official_identifier": null,
+      "date": "1996",
+      "source_pages": [1, 2, 4, 10],
+      "evidence": [
+        {
+          "page": 1,
+          "text": "SEBI (Custodian) Regulations, 1996 (Custodian Regulations)."
+        },
+        {
+          "page": 2,
+          "text": "Regulation 13 of Custodian Regulations and Regulation 7(1) of SEBI (Custodian) Regulations, 1996."
+        },
+        {
+          "page": 4,
+          "text": "Inserted Regulation 19B in the Custodian Regulations."
+        },
+        {
+          "page": 10,
+          "text": "Regulations 9(f), 13 and 19B of SEBI (Custodian) Regulations, 1996."
+        }
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_key": "banking_regulation_act_1949",
+      "document_type": "act",
+      "canonical_title": "Banking Regulation Act, 1949",
+      "aliases": [
+        "Banking Regulation Act, 1949",
+        "Banking Regulations Act, 1949"
+      ],
+      "official_identifier": null,
+      "date": "1949",
+      "source_pages": [1],
+      "evidence": [
+        {
+          "page": 1,
+          "text": "Banking Regulations Act, 1949."
+        }
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_key": "sebi_circular_cir_mirsd_5_2013",
+      "document_type": "circular",
+      "canonical_title": "SEBI Circular CIR/MIRSD/5/2013 dated August 27, 2013",
+      "aliases": [
+        "SEBI Circular no. CIR/MIRSD/5/2013 dated August 27, 2013",
+        "CIR/MIRSD/5/2013"
+      ],
+      "official_identifier": "CIR/MIRSD/5/2013",
+      "date": "2013-08-27",
+      "source_pages": [3],
+      "evidence": [
+        {
+          "page": 3,
+          "text": "SEBI Circular no. CIR/MIRSD/5/2013 dated August 27, 2013."
+        }
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_key": "sebi_circular_cir_mirsd_24_2011",
+      "document_type": "circular",
+      "canonical_title": "SEBI Circular CIR/MIRSD/24/2011 dated December 15, 2011",
+      "aliases": [
+        "SEBI Circular CIR/MIRSD/24/2011 dated 15 Dec 2011",
+        "CIR/MIRSD/24/2011"
+      ],
+      "official_identifier": "CIR/MIRSD/24/2011",
+      "date": "2011-12-15",
+      "source_pages": [3],
+      "evidence": [
+        {
+          "page": 3,
+          "text": "SEBI Circular CIR/MIRSD/24/2011 dated 15 Dec 2011."
+        }
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_key": "custodian_master_circular_2024_05_10",
+      "document_type": "master_circular",
+      "canonical_title": "Master Circular for Custodians",
+      "aliases": [
+        "SEBI's Master Circular dated May 10, 2024 for Custodians",
+        "Custodian Master Circular",
+        "Master Circular for Custodians"
+      ],
+      "official_identifier": null,
+      "date": "2024-05-10",
+      "source_pages": [3, 9],
+      "evidence": [
+        {
+          "page": 3,
+          "text": "Chapter III of SEBI's Master Circular dated May 10, 2024 for Custodians."
+        },
+        {
+          "page": 9,
+          "text": "Custodian Master Circular has specified various reporting requirements."
+        }
+      ],
+      "resolved_url": null
+    },
+    {
+      "canonical_key": "sebi_act_1992",
+      "document_type": "act",
+      "canonical_title": "Securities and Exchange Board of India Act, 1992",
+      "aliases": [
+        "Securities and Exchange Board of India Act, 1992"
+      ],
+      "official_identifier": null,
+      "date": "1992",
+      "source_pages": [10],
+      "evidence": [
+        {
+          "page": 10,
+          "text": "Section 11(1) of the Securities and Exchange Board of India Act, 1992."
+        }
+      ],
+      "resolved_url": null
+    }
+  ],
+  "abstain_mentions": [
+    {
+      "page": 1,
+      "text": "notification dated September 18, 2025",
+      "reason": "External notification mention is real but lacks a stable in-text title or identifier; exclude from primary v1 scoring unless you explicitly support untitled notification objects."
+    },
+    {
+      "page": 4,
+      "text": "Gazette notification dated September 18, 2025",
+      "reason": "Same exclusion as above."
+    },
+    {
+      "page": 2,
+      "text": "such conditions as may be specified by SEBI",
+      "reason": "Generic future guidance, not a specific document."
+    },
+    {
+      "page": 10,
+      "text": "This Circular",
+      "reason": "Self-reference to the source document."
+    }
+  ]
+}
