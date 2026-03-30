@@ -23,6 +23,7 @@ python3 agent-work/extract_references.py pdfs/
 
 # Extract with Gemini AI discovery (finds references regex missed — cross-paragraph splits,
 # non-hardcoded acts, non-standard phrasing)
+pip install google-genai
 python3 agent-work/extract_references.py pdfs/ --use-ai
 
 # Launch the API server (Swagger UI at http://localhost:8000/docs)
@@ -51,7 +52,7 @@ python3 agent-work/extract_references.py pdfs/ --use-ai && python3 evals/make_pr
 agent-work/
   extract_references.py      # main extraction agent — start here
   structured_pdf_extract.py  # PDF layout parser (pdfminer + pypdf), page-aware paragraphs
-  vendor/                    # vendored pdfminer-six, pypdf, cryptography (no pip install needed)
+  vendor/                    # vendored pdfminer-six, pypdf, cryptography (no pip install needed for deterministic extraction)
 
 pdfs/                        # 5 SEBI source PDFs used for development
 
@@ -73,7 +74,7 @@ evals/
 
 api/
   server.py                # FastAPI server — POST /extract + Swagger UI at /docs
-  requirements.txt         # fastapi, uvicorn, python-multipart
+  requirements.txt         # fastapi, uvicorn, python-multipart, google-genai
 
 viewer/
   index.html               # general-purpose reference viewer (pure HTML/CSS/JS, no build step)

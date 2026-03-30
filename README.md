@@ -19,10 +19,11 @@ For each input PDF the agent produces a structured JSON file containing:
 
 ## Setup
 
-**Python 3.10+** required. All PDF dependencies are vendored under `agent-work/vendor/` — no pip install needed for extraction.
+**Python 3.10+** required. All PDF dependencies are vendored under `agent-work/vendor/` — no pip install needed for deterministic extraction.
 
-For the optional AI discovery step, set a Gemini API key:
+For the optional AI discovery step, install the official Gemini SDK and set a Gemini API key:
 ```bash
+pip install google-genai
 export GEMINI_API_KEY=<your-key>
 # or
 export GOOGLE_API_KEY=<your-key>
@@ -104,7 +105,7 @@ uvicorn api.server:app --reload --port 8000
 - `gemini_model` (string, default `gemini-2.5-flash`) — model to use when `use_ai=true`
 - `resolve_urls` (bool, default `false`) — attempt to find sebi.gov.in listing URLs for each referenced document
 
-Requires a `GEMINI_API_KEY` in `.env` only when `use_ai=true`. The extraction itself has no external dependencies beyond the vendored PDF libraries.
+Requires a `GEMINI_API_KEY` in `.env` only when `use_ai=true`. The deterministic extractor has no external dependencies beyond the vendored PDF libraries; the optional AI pass uses the official `google-genai` SDK.
 
 ---
 

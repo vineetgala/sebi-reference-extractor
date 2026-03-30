@@ -7,7 +7,6 @@ import os
 import re
 import sys
 import urllib.error
-import urllib.request
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
@@ -613,31 +612,33 @@ def consolidate_mentions(paragraph: dict, text: str, findings: list[dict], sourc
 
 def ai_discovery_schema() -> dict:
     return {
-        "type": "OBJECT",
+        "type": "object",
         "properties": {
             "discovered_references": {
-                "type": "ARRAY",
+                "type": "array",
                 "items": {
-                    "type": "OBJECT",
+                    "type": "object",
                     "properties": {
                         "document_type": {
-                            "type": "STRING",
+                            "type": "string",
                             "enum": ["circular", "master_circular", "regulations", "act", "notification"],
                         },
-                        "title": {"type": ["STRING", "null"]},
-                        "identifier": {"type": ["STRING", "null"]},
-                        "year_or_date": {"type": ["STRING", "null"]},
-                        "source_page": {"type": "INTEGER"},
-                        "evidence_text": {"type": "STRING"},
-                        "exact_quote": {"type": "STRING"},
+                        "title": {"type": ["string", "null"]},
+                        "identifier": {"type": ["string", "null"]},
+                        "year_or_date": {"type": ["string", "null"]},
+                        "source_page": {"type": "integer"},
+                        "evidence_text": {"type": "string"},
+                        "exact_quote": {"type": "string"},
                     },
                     "required": [
                         "document_type", "title", "identifier", "year_or_date",
                         "source_page", "evidence_text", "exact_quote",
                     ],
+                    "additionalProperties": False,
                 },
             }
         },
+        "additionalProperties": False,
         "required": ["discovered_references"],
     }
 
@@ -684,31 +685,38 @@ def build_ai_discovery_prompt(source: dict, structured: dict, already_found: lis
 
 
 def call_gemini_json(prompt: str, model: str, api_key: str, schema: dict) -> dict:
-    request_body = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {
-            "responseMimeType": "application/json",
-            "responseJsonSchema": schema,
-            "temperature": 0.1,
-        },
-    }
-    request = urllib.request.Request(
-        url=f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
-        data=json.dumps(request_body).encode("utf-8"),
-        headers={
-            "Content-Type": "application/json",
-            "x-goog-api-key": api_key,
-        },
-        method="POST",
-    )
-    with urllib.request.urlopen(request, timeout=60) as response:
-        payload = json.loads(response.read().decode("utf-8"))
+    try:
+        from google import genai
+    except ImportError as exc:
+        raise RuntimeError(
+            "AI review requested, but the Gemini SDK is not installed. Install `google-genai` first."
+        ) from exc
 
-    parts = payload.get("candidates", [{}])[0].get("content", {}).get("parts", [])
-    text = "".join(part.get("text", "") for part in parts).strip()
+    try:
+        with genai.Client(api_key=api_key) as client:
+            response = client.models.generate_content(
+                model=model,
+                contents=prompt,
+                config={
+                    "response_mime_type": "application/json",
+                    "response_json_schema": schema,
+                    "temperature": 0.1,
+                },
+            )
+    except Exception as exc:
+        raise RuntimeError(f"Gemini request failed: {exc}") from exc
+
+    parsed = getattr(response, "parsed", None)
+    if isinstance(parsed, dict):
+        return parsed
+
+    text = (getattr(response, "text", None) or "").strip()
     if not text:
         raise ValueError("Gemini returned no structured JSON text.")
-    return json.loads(text)
+    payload = json.loads(text)
+    if not isinstance(payload, dict):
+        raise ValueError("Gemini returned JSON, but it was not an object.")
+    return payload
 
 
 def apply_ai_discoveries(
