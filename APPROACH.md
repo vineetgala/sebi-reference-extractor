@@ -110,6 +110,7 @@ The scorer (`evals/evaluate.py`) matches predictions to gold via a three-step lo
 | `page_f1` | Whether each (document, source_page) pair was found |
 | `title_exact_recall` | Whether the predicted title normalises to the gold canonical |
 | `type_accuracy` | Whether the document type is correct for matched docs |
+| `url_resolution_rate` | Fraction of predicted documents for which a sebi.gov.in URL was resolved (prediction-side only — no gold URL required) |
 
 ### Improvement story
 

@@ -30,8 +30,8 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
 
 
 if __name__ == "__main__":
+    socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("", PORT), _Handler) as httpd:
-        httpd.allow_reuse_address = True
         url = f"http://localhost:{PORT}/viewer/"
         print(f"\n  SEBI Reference Viewer  →  {url}\n")
         print("  Press Ctrl-C to stop.\n")

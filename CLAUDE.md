@@ -146,11 +146,11 @@ The scorer (`evals/evaluate.py`) matches predictions to gold using:
 
 ## Eval results summary
 
-| Snapshot | Doc F1 | Page F1 | Title Exact | Doc Precision | Description |
-|---|---:|---:|---:|---:|---|
-| v0 baseline | 83.6% | 76.4% | 71.0% | 91.0% | Initial extractor, 4 bugs |
-| v3 optimized | 97.1% | 98.2% | 88.3% | 100.0% | After eval-driven regex fixes |
-| v5 AI discovery | 100.0% | 100.0% | 93.3% | 100.0% | regex + Gemini discovery pass |
+| Snapshot | Doc F1 | Page F1 | Title Exact | Doc Precision | URL Resolution Rate | Description |
+|---|---:|---:|---:|---:|---:|---|
+| v0 baseline | 83.6% | 76.4% | 71.0% | 91.0% | n/a | Initial extractor, 4 bugs |
+| v3 optimized | 97.1% | 98.2% | 88.3% | 100.0% | 68.7% | After eval-driven regex fixes |
+| v5 AI discovery | 100.0% | 100.0% | 93.3% | 100.0% | 68.7% | regex + Gemini discovery pass |
 
 Full progression with per-fixture breakdown and fix-by-fix explanation: `evals/RESULTS.md`
 

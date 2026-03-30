@@ -804,7 +804,7 @@ def analyze_document(pdf_path: Path, *, use_ai: bool = False, resolve_urls: bool
         counts = resolve_document_urls(records)
         url_resolution = {"enabled": True, **counts}
 
-    return {
+    return structured, {
         "schema_version": "1.0.0",
         "extraction_method": {
             "mode": "deterministic_with_ai_discovery" if use_ai else "deterministic",
@@ -836,6 +836,27 @@ def output_path_for(pdf_path: Path, output_dir: Path) -> Path:
     return output_dir / f"{pdf_path.stem}.references.json"
 
 
+def pages_path_for(pdf_path: Path, output_dir: Path) -> Path:
+    return output_dir / f"{pdf_path.stem}.pages.json"
+
+
+def build_pages_output(structured: dict) -> dict:
+    """Slim structured text for the viewer — all pages, all paragraphs."""
+    return {
+        "pages": [
+            {
+                "page_number": page["page_number"],
+                "paragraphs": [
+                    {"paragraph_id": p["paragraph_id"], "text": compact(p["text"])}
+                    for p in page["paragraphs"]
+                    if compact(p["text"])
+                ],
+            }
+            for page in structured["pages"]
+        ]
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Extract structured references from SEBI circular PDFs.")
     parser.add_argument("input", help="PDF file or directory containing PDFs")
@@ -858,12 +879,14 @@ def main() -> int:
 
     for pdf_path in pdf_paths:
         try:
-            result = analyze_document(pdf_path, use_ai=args.use_ai, resolve_urls=args.resolve_urls, gemini_model=args.gemini_model)
+            structured, result = analyze_document(pdf_path, use_ai=args.use_ai, resolve_urls=args.resolve_urls, gemini_model=args.gemini_model)
         except (RuntimeError, urllib.error.URLError, ValueError) as exc:
             print(f"{pdf_path}: {exc}", file=sys.stderr)
             return 1
         output_path = output_path_for(pdf_path, output_dir)
         output_path.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
+        pages_path = pages_path_for(pdf_path, output_dir)
+        pages_path.write_text(json.dumps(build_pages_output(structured), indent=2, ensure_ascii=False), encoding="utf-8")
         print(output_path)
 
     return 0

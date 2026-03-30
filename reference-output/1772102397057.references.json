@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0.0",
   "extraction_method": {
-    "mode": "deterministic_with_ai_discovery",
+    "mode": "deterministic",
     "layout_parser": "pdfminer + pypdf via structured_pdf_extract.py",
-    "llm_used": true
+    "llm_used": false
   },
   "source_document": {
     "source_pdf": "pdfs/1772102397057.pdf",
@@ -14,16 +14,16 @@
     "title": "Valuation of physical Gold and Silver held by mutual fund schemes"
   },
   "ai_discovery": {
-    "enabled": true,
-    "provider": "gemini",
-    "model": "gemini-2.5-flash",
-    "discovered_count": 1
+    "enabled": false,
+    "provider": null,
+    "model": null,
+    "discovered_count": 0
   },
   "url_resolution": {
-    "enabled": false,
+    "enabled": true,
     "resolved": 0,
-    "resolved_approx": 0,
-    "unresolved": 0
+    "resolved_approx": 1,
+    "unresolved": 1
   },
   "referenced_documents": [
     {
@@ -37,8 +37,8 @@
       "issuing_body": "SEBI",
       "aliases": [],
       "title_source": "explicit_in_text",
-      "resolution_status": "unresolved",
-      "resolved_url": null
+      "resolution_status": "resolved_approx",
+      "resolved_url": "https://www.sebi.gov.in/legal/regulations/jan-2026/securities-and-exchange-board-of-india-mutual-funds-regulations-2026_99173.html"
     },
     {
       "document_id": "doc_002",
@@ -51,20 +51,6 @@
       "issuing_body": "SEBI",
       "aliases": [],
       "title_source": "explicit_in_text",
-      "resolution_status": "unresolved",
-      "resolved_url": null
-    },
-    {
-      "document_id": "doc_003",
-      "document_type": "notification",
-      "title": null,
-      "short_title": null,
-      "identifier": "LAD-NRO/GN/2026/294",
-      "date": "January 14, 2026",
-      "year": 2026,
-      "issuing_body": null,
-      "aliases": [],
-      "title_source": "ai_discovered",
       "resolution_status": "unresolved",
       "resolved_url": null
     }
@@ -123,34 +109,11 @@
       "confidence_label": "high",
       "confidence_reason": "Full formal title and year are present in the source paragraph.",
       "mention_id": "ref_002"
-    },
-    {
-      "mention_id": "ref_003",
-      "document_id": "doc_003",
-      "source_page": 1,
-      "source_paragraph_id": null,
-      "match_texts": [
-        "notification no. LAD-NRO/GN/2026/294 dated January 14, 2026"
-      ],
-      "evidence_text": "SEBI has notified SEBI (Mutual Funds) Regulations, 2026 vide notification no. LAD-NRO/GN/2026/294 dated January 14, 2026 to come into force from April 01, 2026.",
-      "relation_type": "relies_on",
-      "target_locators": {
-        "raw": null,
-        "paragraphs": [],
-        "regulations": [],
-        "sections": [],
-        "chapters": [],
-        "annexures": [],
-        "clauses": []
-      },
-      "confidence": 0.77,
-      "confidence_label": "medium",
-      "confidence_reason": "Reference identified by AI; not matched by deterministic regex."
     }
   ],
   "summary": {
-    "referenced_document_count": 3,
-    "reference_mention_count": 3,
+    "referenced_document_count": 2,
+    "reference_mention_count": 2,
     "pages_with_references": [
       1,
       2

@@ -121,19 +121,21 @@ No dependencies beyond the Python standard library. The viewer reads `manifest.j
 
 ---
 
-## Current eval results (deterministic baseline)
+## Current eval results (deterministic + URL resolution)
 
-| Fixture | Doc F1 | Page F1 | Title Exact Recall | Type Acc |
-|---|---:|---:|---:|---:|
-| cra_other_fsr_obligations | 100.0% | 100.0% | 100.0% | 100.0% |
-| ease_of_doing_investment_loc | 100.0% | 100.0% | 100.0% | 100.0% |
-| guidelines_for_custodians | 100.0% | 100.0% | 66.7% | 100.0% |
-| stock_broker_reporting_relaxations | 100.0% | 100.0% | 100.0% | 100.0% |
-| valuation_of_gold_and_silver | 100.0% | 100.0% | 100.0% | 100.0% |
+| Fixture | Doc F1 | Page F1 | Title Exact Recall | Type Acc | URL Resolution Rate |
+|---|---:|---:|---:|---:|---:|
+| cra_other_fsr_obligations | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% |
+| ease_of_doing_investment_loc | 100.0% | 100.0% | 100.0% | 100.0% | 60.0% |
+| guidelines_for_custodians | 100.0% | 100.0% | 66.7% | 100.0% | 66.7% |
+| stock_broker_reporting_relaxations | 85.7% | 90.9% | 75.0% | 100.0% | 66.7% |
+| valuation_of_gold_and_silver | 100.0% | 100.0% | 100.0% | 100.0% | 50.0% |
 
 **Macro (with `--use-ai`):** Doc F1 100% · Page F1 100% · Title Exact Recall 93.3% · Doc Precision 100% · Type Accuracy 100%
 
-**Deterministic baseline (no AI):** Doc F1 97.1% · Page F1 98.2%
+**Deterministic baseline (no AI):** Doc F1 97.1% · Page F1 98.2% · URL Resolution Rate 68.7%
+
+URL Resolution Rate = documents the system resolved a sebi.gov.in URL for / total documents predicted. Acts and Regulations resolve reliably; circulars depend on date uniqueness; notifications are not resolvable.
 
 See [`evals/RESULTS.md`](evals/RESULTS.md) for the full progression table showing how eval-driven fixes improved scores from 83% → 97% (regex) → 100% (regex + AI discovery).
 

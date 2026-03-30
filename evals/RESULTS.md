@@ -96,13 +96,13 @@ Before any fixes, the extractor had four bugs the evals revealed:
 
 **What the evals revealed:** `guidelines_for_custodians` had Doc F1 85.7% due to 2 FP notification records in predictions. CRA title exact recall was 50% because "Regulation" (singular) didn't normalize to the canonical plural form.
 
-| Fixture | Doc F1 | Page F1 | Title Exact Recall | Type Acc |
-|---|---:|---:|---:|---:|
-| cra_other_fsr_obligations | 100.0% | 100.0% | 100.0% | 100.0% |
-| ease_of_doing_investment_loc | 100.0% | 100.0% | 100.0% | 100.0% |
-| guidelines_for_custodians | 100.0% | 100.0% | 66.7% | 100.0% |
-| stock_broker_reporting_relaxations | 85.7% | 90.9% | 75.0% | 100.0% |
-| valuation_of_gold_and_silver | 100.0% | 100.0% | 100.0% | 100.0% |
+| Fixture | Doc F1 | Page F1 | Title Exact Recall | Type Acc | URL Resolution Rate |
+|---|---:|---:|---:|---:|---:|
+| cra_other_fsr_obligations | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% |
+| ease_of_doing_investment_loc | 100.0% | 100.0% | 100.0% | 100.0% | 60.0% |
+| guidelines_for_custodians | 100.0% | 100.0% | 66.7% | 100.0% | 66.7% |
+| stock_broker_reporting_relaxations | 85.7% | 90.9% | 75.0% | 100.0% | 66.7% |
+| valuation_of_gold_and_silver | 100.0% | 100.0% | 100.0% | 100.0% | 50.0% |
 
 | Metric | Value |
 |---|---:|
@@ -115,6 +115,7 @@ Before any fixes, the extractor had four bugs the evals revealed:
 | Title Exact Recall | 88.3% |
 | Title Presence Recall | 95.0% |
 | Type Accuracy on Matched Docs | 100.0% |
+| URL Resolution Rate | 68.7% |
 
 This is the **current production baseline**.
 
@@ -143,6 +144,8 @@ The approach:
 | All other PDFs | 0 |
 
 **Why SCCR was previously missed:** The PDF splits "Regulations," and "2018." across two paragraph blocks. The regex processes each paragraph individually and never sees the full title+year. Gemini receives the joined page text and correctly identifies the complete reference.
+
+URL Resolution Rate was not measured for this snapshot (run predates `--resolve-urls`). See v3 for current resolution numbers.
 
 | Fixture | Doc F1 | Page F1 | Title Exact Recall | Type Acc |
 |---|---:|---:|---:|---:|
@@ -184,6 +187,6 @@ This 5-document eval set is a **development set**, not a generalization claim.  
 - Recent 2026 circulars
 - Heavy on Regulations and Master Circular references
 - No ambiguous same-title collision cases
-- No covered resolved URLs (resolution metrics are n/a throughout)
+- URL Resolution Rate measured on deterministic baseline (v3): 68.7% macro average. Acts and Regulations resolve reliably; circulars depend on date uniqueness; notifications are not resolvable.
 
 For v2, prioritise adding: an older circular with many identifier-only references, a PDF where at least one URL can be verified, and a document with degraded PDF text to test OCR robustness.

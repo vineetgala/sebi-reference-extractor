@@ -309,6 +309,9 @@ def evaluate_fixture(gold_fixture: dict[str, Any], pred_fixture: dict[str, Any] 
     resolution_precision = safe_div(resolution_correct, resolution_pred_total)
     resolution_recall = safe_div(resolution_correct, resolution_gold_total)
 
+    docs_with_url = sum(1 for b in aggregated.values() if b["urls"])
+    url_resolution_rate = safe_div(docs_with_url, len(aggregated))
+
     missing_refs = sorted(gold_doc_keys - matched_doc_keys)
     extra_refs = []
     for aggregate_key, bucket in aggregated.items():
@@ -330,6 +333,7 @@ def evaluate_fixture(gold_fixture: dict[str, Any], pred_fixture: dict[str, Any] 
         "title_exact_recall": title_exact_recall,
         "title_presence_recall": title_presence_recall,
         "type_accuracy_on_matched_docs": type_accuracy,
+        "url_resolution_rate": url_resolution_rate,
         "resolution_precision": resolution_precision,
         "resolution_recall": resolution_recall,
         "missing_refs": missing_refs,
@@ -353,18 +357,17 @@ def macro_average(results: list[dict[str, Any]], field_path: tuple[str, ...]) ->
 
 def render_markdown(results: list[dict[str, Any]]) -> str:
     lines = []
-    lines.append("| Fixture | Doc F1 | Page F1 | Title Exact Recall | Type Acc | Resolution P | Resolution R |")
-    lines.append("|---|---:|---:|---:|---:|---:|---:|")
+    lines.append("| Fixture | Doc F1 | Page F1 | Title Exact Recall | Type Acc | URL Resolution Rate |")
+    lines.append("|---|---:|---:|---:|---:|---:|")
     for result in results:
         lines.append(
-            "| {fixture} | {doc_f1} | {page_f1} | {title_exact} | {type_acc} | {res_p} | {res_r} |".format(
+            "| {fixture} | {doc_f1} | {page_f1} | {title_exact} | {type_acc} | {url_rate} |".format(
                 fixture=result["fixture_id"],
                 doc_f1=format_metric(result["doc_metrics"]["f1"]),
                 page_f1=format_metric(result["page_metrics"]["f1"]),
                 title_exact=format_metric(result["title_exact_recall"]),
                 type_acc=format_metric(result["type_accuracy_on_matched_docs"]),
-                res_p=format_metric(result["resolution_precision"]),
-                res_r=format_metric(result["resolution_recall"]),
+                url_rate=format_metric(result["url_resolution_rate"]),
             )
         )
 
@@ -382,8 +385,7 @@ def render_markdown(results: list[dict[str, Any]]) -> str:
     lines.append(f"| Title Exact Recall | {format_metric(macro_average(results, ('title_exact_recall',)))} |")
     lines.append(f"| Title Presence Recall | {format_metric(macro_average(results, ('title_presence_recall',)))} |")
     lines.append(f"| Type Accuracy on Matched Docs | {format_metric(macro_average(results, ('type_accuracy_on_matched_docs',)))} |")
-    lines.append(f"| Resolution Precision | {format_metric(macro_average(results, ('resolution_precision',)))} |")
-    lines.append(f"| Resolution Recall | {format_metric(macro_average(results, ('resolution_recall',)))} |")
+    lines.append(f"| URL Resolution Rate | {format_metric(macro_average(results, ('url_resolution_rate',)))} |")
     return "\n".join(lines)
 
 

@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0.0",
   "extraction_method": {
-    "mode": "deterministic_with_ai_discovery",
+    "mode": "deterministic",
     "layout_parser": "pdfminer + pypdf via structured_pdf_extract.py",
-    "llm_used": true
+    "llm_used": false
   },
   "source_document": {
     "source_pdf": "pdfs/1774264133189.pdf",
@@ -14,16 +14,16 @@
     "title": "Ease of doing business measures – Relaxations in certain reporting requirements for certain Stock Brokers and doing away with the requirement of reporting of demat account"
   },
   "ai_discovery": {
-    "enabled": true,
-    "provider": "gemini",
-    "model": "gemini-2.5-flash",
-    "discovered_count": 1
+    "enabled": false,
+    "provider": null,
+    "model": null,
+    "discovered_count": 0
   },
   "url_resolution": {
-    "enabled": false,
-    "resolved": 0,
-    "resolved_approx": 0,
-    "unresolved": 0
+    "enabled": true,
+    "resolved": 1,
+    "resolved_approx": 1,
+    "unresolved": 1
   },
   "referenced_documents": [
     {
@@ -40,8 +40,8 @@
         "hereinafter mentioned as \"Master Circular"
       ],
       "title_source": "explicit_in_text",
-      "resolution_status": "unresolved",
-      "resolved_url": null
+      "resolution_status": "resolved",
+      "resolved_url": "https://www.sebi.gov.in/legal/master-circulars/jun-2025/master-circular-for-stock-brokers_94623.html"
     },
     {
       "document_id": "doc_002",
@@ -54,8 +54,8 @@
       "issuing_body": null,
       "aliases": [],
       "title_source": "explicit_in_text",
-      "resolution_status": "unresolved",
-      "resolved_url": null
+      "resolution_status": "resolved_approx",
+      "resolved_url": "https://www.sebi.gov.in/legal/acts/jan-1992/securities-and-exchange-board-of-india-act-1992-as-amended-by-the-finance-act-2021-13-of-2021-w-e-f-april-1-2021-_3.html"
     },
     {
       "document_id": "doc_003",
@@ -68,20 +68,6 @@
       "issuing_body": null,
       "aliases": [],
       "title_source": "explicit_in_text",
-      "resolution_status": "unresolved",
-      "resolved_url": null
-    },
-    {
-      "document_id": "doc_004",
-      "document_type": "regulations",
-      "title": "Securities Contracts (Regulation) (Stock Exchanges and Clearing Corporations) Regulations, 2018",
-      "short_title": null,
-      "identifier": null,
-      "date": null,
-      "year": 2018,
-      "issuing_body": null,
-      "aliases": [],
-      "title_source": "ai_discovered",
       "resolution_status": "unresolved",
       "resolved_url": null
     }
@@ -264,34 +250,11 @@
       "confidence_label": "high",
       "confidence_reason": "Full formal title and year are present in the source paragraph.",
       "mention_id": "ref_007"
-    },
-    {
-      "mention_id": "ref_008",
-      "document_id": "doc_004",
-      "source_page": 4,
-      "source_paragraph_id": null,
-      "match_texts": [
-        "Regulation 51 of Securities Contracts (Regulation) (Stock Exchanges and Clearing Corporations) Regulations, 2018"
-      ],
-      "evidence_text": "Regulation 51 of Securities Contracts (Regulation) (Stock Exchanges and Clearing Corporations) Regulations, 2018 to protect the interests of investors in securities and to promote the development of, and to regulate the securities markets.",
-      "relation_type": "references",
-      "target_locators": {
-        "raw": null,
-        "paragraphs": [],
-        "regulations": [],
-        "sections": [],
-        "chapters": [],
-        "annexures": [],
-        "clauses": []
-      },
-      "confidence": 0.77,
-      "confidence_label": "medium",
-      "confidence_reason": "Reference identified by AI; not matched by deterministic regex."
     }
   ],
   "summary": {
-    "referenced_document_count": 4,
-    "reference_mention_count": 8,
+    "referenced_document_count": 3,
+    "reference_mention_count": 7,
     "pages_with_references": [
       1,
       2,
