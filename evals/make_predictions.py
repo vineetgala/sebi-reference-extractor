@@ -26,10 +26,9 @@ def build_fixture_id_map(gold_dir: Path) -> dict[str, str]:
 
 
 def pick_title(doc: dict) -> str | None:
-    # title     = full explicit name (Acts, Regulations, Master Circulars)
+    # title       = full explicit name (Acts, Regulations, Master Circulars)
     # short_title = identifier + date for SEBI Circulars — matches gold canonical format
-    # descriptive_title = AI-enriched subject phrase — human-readable enrichment, not a canonical key
-    return doc.get("title") or doc.get("short_title") or doc.get("descriptive_title")
+    return doc.get("title") or doc.get("short_title")
 
 
 def convert_to_prediction(references_json: dict) -> list[dict]:
@@ -46,6 +45,11 @@ def convert_to_prediction(references_json: dict) -> list[dict]:
         # Skip bare date-only notifications (title_source generic_only, no stable identifier).
         # These are real PDF references but lack enough identity for precision scoring.
         if doc.get("document_type") == "notification" and doc.get("title_source") == "generic_only":
+            continue
+        # Skip AI-discovered notifications with no title — these are typically supporting-metadata
+        # identifiers (e.g. gazette notification numbers that contextualise a regulations mention)
+        # rather than standalone scoreable documents.
+        if doc.get("document_type") == "notification" and doc.get("title_source") == "ai_discovered" and not doc.get("title"):
             continue
         references.append(
             {

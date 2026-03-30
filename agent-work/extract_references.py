@@ -103,15 +103,12 @@ class DocumentRecord:
     document_type: str
     title: str | None
     short_title: str | None
-    descriptive_title: str | None
-    descriptive_title_source: str | None
     identifier: str | None
     date: str | None
     year: int | None
     issuing_body: str | None
     aliases: list[str]
     title_source: str
-    ai_review_notes: str | None
     resolution_status: str
     resolved_url: str | None
 
@@ -231,15 +228,12 @@ class Registry:
             document_type=document_type,
             title=normalize_title_case_whitespace(title),
             short_title=normalize_title_case_whitespace(short_title),
-            descriptive_title=None,
-            descriptive_title_source=None,
             identifier=normalize_title_case_whitespace(identifier),
             date=normalize_title_case_whitespace(date),
             year=year,
             issuing_body=issuing_body,
             aliases=sorted({alias for alias in (clean_alias(alias) for alias in aliases) if alias}),
             title_source=title_source,
-            ai_review_notes=None,
             resolution_status="unresolved",
             resolved_url=None,
         )
@@ -582,89 +576,85 @@ def consolidate_mentions(paragraph: dict, text: str, findings: list[dict], sourc
     return sorted(mentions, key=lambda item: item["document_id"])
 
 
-def ai_review_candidates(records: list[DocumentRecord], mentions: list[dict]) -> list[dict]:
-    mention_index: dict[str, list[dict]] = defaultdict(list)
-    for mention in mentions:
-        mention_index[mention["document_id"]].append(mention)
-
-    candidates: list[dict] = []
-    for record in records:
-        if record.document_type not in {"circular", "notification"}:
-            continue
-        if record.title:
-            continue
-        evidence_texts = []
-        for mention in mention_index.get(record.document_id, [])[:3]:
-            if mention["evidence_text"] not in evidence_texts:
-                evidence_texts.append(mention["evidence_text"])
-        if not evidence_texts:
-            continue
-        candidates.append(
-            {
-                "document_id": record.document_id,
-                "document_type": record.document_type,
-                "identifier": record.identifier,
-                "date": record.date,
-                "current_short_title": record.short_title,
-                "evidence_texts": evidence_texts,
-            }
-        )
-    return candidates
-
-
-def gemini_review_schema() -> dict:
+def ai_discovery_schema() -> dict:
     return {
         "type": "OBJECT",
         "properties": {
-            "reviews": {
+            "discovered_references": {
                 "type": "ARRAY",
                 "items": {
                     "type": "OBJECT",
                     "properties": {
-                        "document_id": {"type": "STRING"},
-                        "keep_document": {"type": "BOOLEAN"},
-                        "descriptive_title": {"type": "STRING", "nullable": True},
-                        "descriptive_title_source": {
+                        "document_type": {
                             "type": "STRING",
-                            "enum": ["none", "explicit_phrase_in_evidence", "purpose_clause_in_evidence"],
+                            "enum": ["circular", "master_circular", "regulations", "act", "notification"],
                         },
-                        "notes": {"type": "STRING"},
+                        "title": {"type": ["STRING", "null"]},
+                        "identifier": {"type": ["STRING", "null"]},
+                        "year_or_date": {"type": ["STRING", "null"]},
+                        "source_page": {"type": "INTEGER"},
+                        "evidence_text": {"type": "STRING"},
+                        "exact_quote": {"type": "STRING"},
                     },
-                    "required": ["document_id", "keep_document", "descriptive_title", "descriptive_title_source", "notes"],
+                    "required": [
+                        "document_type", "title", "identifier", "year_or_date",
+                        "source_page", "evidence_text", "exact_quote",
+                    ],
                 },
             }
         },
-        "required": ["reviews"],
+        "required": ["discovered_references"],
     }
 
 
-def build_ai_prompt(source: dict, candidates: list[dict]) -> str:
-    instructions = [
-        "You are reviewing deterministic reference extraction from a SEBI circular PDF.",
-        "Use only the evidence snippets provided below. Do not use outside knowledge.",
-        "For each candidate document:",
-        "1. keep_document should usually be true unless the candidate is clearly not another document.",
-        "2. descriptive_title should be null unless the evidence contains an identifying phrase beyond a bare identifier/date.",
-        "3. If you provide descriptive_title, copy or lightly normalize the phrase from evidence. Do not invent an official title.",
-        "4. If the evidence only gives an identifier and date, return descriptive_title as null and descriptive_title_source as none.",
+def build_ai_discovery_prompt(source: dict, structured: dict, already_found: list[DocumentRecord]) -> str:
+    already_found_list = [
+        {
+            "document_type": r.document_type,
+            "title": r.title or r.short_title,
+            "identifier": r.identifier,
+            "date": r.date,
+        }
+        for r in already_found
     ]
-    payload = {
-        "source_document": {
-            "title": source.get("title"),
-            "circular_number": source.get("circular_number"),
-            "issue_date": source.get("issue_date"),
-        },
-        "candidates": candidates,
-    }
-    return "\n".join(instructions) + "\n\nINPUT JSON:\n" + json.dumps(payload, ensure_ascii=False, indent=2)
+
+    pages_text_parts = []
+    for page in structured["pages"]:
+        para_texts = [compact(p["text"]) for p in page["paragraphs"] if compact(p["text"])]
+        if para_texts:
+            # Join paragraphs with a space so cross-paragraph title fragments
+            # (e.g. "Regulations," on one line, "2018." on the next) read as
+            # continuous text and are easier for the model to recognise.
+            pages_text_parts.append(f"=== PAGE {page['page_number']} ===\n" + " ".join(para_texts))
+
+    return "\n".join([
+        "You are reviewing a SEBI circular PDF to find references to external documents.",
+        "A regex extractor already found the references listed below.",
+        "Your task: identify any ADDITIONAL references it missed.",
+        "",
+        "Already found by regex (do NOT return these again):",
+        json.dumps(already_found_list, ensure_ascii=False, indent=2),
+        "",
+        "Rules:",
+        "1. Only return references EXPLICITLY present in the document text below.",
+        "2. Do NOT re-report any reference already in the 'already found' list.",
+        "3. Do NOT return self-references ('this circular', 'present circular', 'the circular').",
+        "4. Do NOT invent titles or identifiers — copy exactly from the text.",
+        "5. source_page must be the page number from the === PAGE N === header where the text appears.",
+        "6. If nothing was missed, return an empty discovered_references list.",
+        "",
+        "FULL DOCUMENT TEXT:",
+        "\n\n".join(pages_text_parts),
+    ])
 
 
-def call_gemini_json(prompt: str, model: str, api_key: str) -> dict:
+def call_gemini_json(prompt: str, model: str, api_key: str, schema: dict) -> dict:
     request_body = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
             "responseMimeType": "application/json",
-            "responseJsonSchema": gemini_review_schema(),
+            "responseJsonSchema": schema,
+            "temperature": 0.1,
         },
     }
     request = urllib.request.Request(
@@ -686,27 +676,88 @@ def call_gemini_json(prompt: str, model: str, api_key: str) -> dict:
     return json.loads(text)
 
 
-def apply_ai_reviews(records: list[DocumentRecord], reviews: list[dict]) -> dict:
-    review_index = {item["document_id"]: item for item in reviews}
-    changes_applied = 0
-    for record in records:
-        review = review_index.get(record.document_id)
-        if not review:
+def apply_ai_discoveries(
+    registry: Registry,
+    discoveries: list[dict],
+    mention_counter: int,
+    source_title: str | None,
+) -> tuple[list[dict], int]:
+    new_mentions: list[dict] = []
+    for disc in discoveries:
+        exact_quote = disc.get("exact_quote") or ""
+        evidence_text = disc.get("evidence_text") or ""
+
+        skip_phrases = ("this circular", "present circular", "the circular")
+        if any(phrase in exact_quote.lower() for phrase in skip_phrases):
             continue
-        record.ai_review_notes = review.get("notes")
-        descriptive_title = normalize_title_case_whitespace(review.get("descriptive_title"))
-        source = review.get("descriptive_title_source")
-        if descriptive_title and descriptive_title != record.descriptive_title:
-            record.descriptive_title = descriptive_title
-            record.descriptive_title_source = source
-            changes_applied += 1
-    return {
-        "reviewed_document_ids": sorted(review_index.keys()),
-        "changes_applied": changes_applied,
-    }
+        if source_title and compact(source_title).lower() in exact_quote.lower():
+            continue
+
+        doc_type = disc.get("document_type") or "other"
+        title = normalize_title_case_whitespace(disc.get("title"))
+        identifier = normalize_title_case_whitespace(disc.get("identifier"))
+
+        # If AI put a section/locator reference in the identifier field (e.g. "Regulation 51"
+        # or "Section 11 (1) of the Securities and Exchange"), it is not a real document
+        # identifier.  If a title is also present, just clear the identifier and keep the
+        # record (the title is the canonical key).  If there is no title either, the record
+        # is useless — skip it entirely.
+        if identifier and re.search(r"^(?:section|regulation|article|clause|para)\b", identifier.lower()):
+            if not title:
+                continue
+            identifier = None
+        raw_date = (disc.get("year_or_date") or "").strip()
+        year = parse_year(raw_date)
+        date = normalize_title_case_whitespace(raw_date) if raw_date and not re.fullmatch(r"(19|20)\d{2}", raw_date) else None
+
+        # For regulations/acts, append year to title if not already present so the canonical
+        # title matches the "Name, YEAR" format that regex extraction and eval gold use.
+        if title and year and doc_type in {"regulations", "act"} and str(year) not in title:
+            title = f"{title}, {year}"
+
+        # Drop clearly truncated or incomplete formal-instrument titles:
+        # a valid act title must contain the word "Act"; a valid regulations title must contain
+        # "Regulation". If absent, the PDF text was cut off and the record is unusable.
+        if doc_type == "act" and title and not re.search(r"\bact\b", title.lower()):
+            continue
+        if doc_type == "regulations" and title and not re.search(r"\bregulations?\b", title.lower()):
+            continue
+
+        record = registry.upsert(
+            document_type=doc_type,
+            title=title,
+            short_title=None,
+            identifier=identifier,
+            date=date,
+            year=year,
+            issuing_body="SEBI" if (
+                doc_type in {"circular", "master_circular"}
+                or (title or "").upper().startswith("SEBI")
+            ) else None,
+            aliases=[],
+            title_source="ai_discovered",
+        )
+
+        mention_counter += 1
+        loc_prefix = evidence_text[: evidence_text.find(exact_quote)] if exact_quote in evidence_text else ""
+        new_mentions.append({
+            "mention_id": f"ref_{mention_counter:03d}",
+            "document_id": record.document_id,
+            "source_page": disc.get("source_page", 1),
+            "source_paragraph_id": None,
+            "match_texts": [exact_quote] if exact_quote else [],
+            "evidence_text": evidence_text,
+            "relation_type": relation_type_for(evidence_text),
+            "target_locators": extract_locators(loc_prefix),
+            "confidence": 0.77,
+            "confidence_label": "medium",
+            "confidence_reason": "Reference identified by AI; not matched by deterministic regex.",
+        })
+
+    return new_mentions, mention_counter
 
 
-def analyze_document(pdf_path: Path, *, use_ai: bool = False, gemini_model: str = "gemini-2.5-flash") -> dict:
+def analyze_document(pdf_path: Path, *, use_ai: bool = False, resolve_urls: bool = False, gemini_model: str = "gemini-2.5-flash") -> dict:
     structured = build_document(pdf_path)
     source = extract_source_metadata(structured)
     registry = Registry()
@@ -727,39 +778,42 @@ def analyze_document(pdf_path: Path, *, use_ai: bool = False, gemini_model: str 
                 mentions.append(mention)
 
     records = registry.records()
-    ai_section = {
-        "enabled": False,
-        "provider": None,
-        "model": None,
-        "reviewed_document_ids": [],
-        "changes_applied": 0,
-    }
+    ai_section: dict = {"enabled": False, "provider": None, "model": None, "discovered_count": 0}
     if use_ai:
         api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
         if not api_key:
             raise RuntimeError("AI review requested, but GEMINI_API_KEY / GOOGLE_API_KEY is missing.")
-        candidates = ai_review_candidates(records, mentions)
+        discovery_prompt = build_ai_discovery_prompt(source, structured, records)
+        discovery_payload = call_gemini_json(discovery_prompt, gemini_model, api_key, ai_discovery_schema())
+        new_mentions, mention_counter = apply_ai_discoveries(
+            registry, discovery_payload.get("discovered_references", []), mention_counter, source["title"]
+        )
+        mentions.extend(new_mentions)
+        records = registry.records()
         ai_section = {
             "enabled": True,
             "provider": "gemini",
             "model": gemini_model,
-            "reviewed_document_ids": [],
-            "changes_applied": 0,
+            "discovered_count": len(new_mentions),
         }
-        if candidates:
-            prompt = build_ai_prompt(source, candidates)
-            review_payload = call_gemini_json(prompt, gemini_model, api_key)
-            ai_section.update(apply_ai_reviews(records, review_payload.get("reviews", [])))
+
+    url_resolution: dict = {"enabled": False, "resolved": 0, "resolved_approx": 0, "unresolved": 0}
+    if resolve_urls:
+        sys.path.insert(0, str(Path(__file__).parent))
+        from resolve_urls import resolve_document_urls  # noqa: PLC0415
+        counts = resolve_document_urls(records)
+        url_resolution = {"enabled": True, **counts}
 
     return {
         "schema_version": "1.0.0",
         "extraction_method": {
-            "mode": "deterministic_with_optional_ai_review" if use_ai else "deterministic",
+            "mode": "deterministic_with_ai_discovery" if use_ai else "deterministic",
             "layout_parser": "pdfminer + pypdf via structured_pdf_extract.py",
             "llm_used": use_ai,
         },
         "source_document": source,
-        "ai_enrichment": ai_section,
+        "ai_discovery": ai_section,
+        "url_resolution": url_resolution,
         "referenced_documents": [record.__dict__ for record in records],
         "reference_mentions": mentions,
         "summary": {
@@ -790,7 +844,8 @@ def main() -> int:
         default=str(BASE_DIR / "reference-output"),
         help="Directory for reference JSON output files",
     )
-    parser.add_argument("--use-ai", action="store_true", help="Enable Gemini review for ambiguous identifier-only references")
+    parser.add_argument("--use-ai", action="store_true", help="Enable Gemini discovery pass to find references the regex extractor missed")
+    parser.add_argument("--resolve-urls", action="store_true", help="Attempt to resolve sebi.gov.in URLs for referenced documents via the SEBI listing API")
     parser.add_argument("--gemini-model", default="gemini-2.5-flash", help="Gemini model name for optional AI review")
     args = parser.parse_args()
 
@@ -803,7 +858,7 @@ def main() -> int:
 
     for pdf_path in pdf_paths:
         try:
-            result = analyze_document(pdf_path, use_ai=args.use_ai, gemini_model=args.gemini_model)
+            result = analyze_document(pdf_path, use_ai=args.use_ai, resolve_urls=args.resolve_urls, gemini_model=args.gemini_model)
         except (RuntimeError, urllib.error.URLError, ValueError) as exc:
             print(f"{pdf_path}: {exc}", file=sys.stderr)
             return 1

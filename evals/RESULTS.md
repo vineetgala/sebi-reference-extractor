@@ -122,29 +122,49 @@ This is the **current production baseline**.
 
 ---
 
-### v4 — AI enrichment pass (gemini-2.5-flash)
+### v5 — AI discovery pass (gemini-2.5-flash, temperature 0.1)
 
-**Snapshot:** `evals/snapshots/v4_ai_enriched/`
+**Snapshot:** `evals/snapshots/v5_ai_discovery/`
 
-**What changed:** Ran the extractor with `--use-ai`. Gemini 2.5 Flash reviewed all identifier-only circular records (those where `title` is null) using up to 3 evidence snippets from the PDF. The prompt is strictly grounded: only extract a phrase that appears in the evidence, never invent.
+**What changed:** Replaced the previous enrichment-only AI pass with an **AI discovery pass** that reads the full document text and finds references the regex extractor missed.
 
-**Candidates found:**
+The approach:
+- All paragraph text is joined per page (with spaces, not newlines, so cross-paragraph title fragments appear continuous)
+- Already-found regex records are provided to Gemini to avoid re-reporting
+- Gemini returns structured JSON: `document_type`, `title`, `identifier`, `year_or_date`, `source_page`, `evidence_text`, `exact_quote`
+- `temperature: 0.1` for near-deterministic output
+- Post-processing filters: self-references dropped; locator references in the identifier field cleared; truncated act titles (no "Act" keyword) dropped; AI-discovered notifications with no title dropped (gazette IDs that are metadata for a regulations mention, not standalone documents)
 
-| Source PDF | Candidates | Changes |
-|---|---:|---:|
-| Guidelines for Custodians | 2 | 2 |
-| All other PDFs | 0 | 0 |
+**What AI found (per PDF):**
 
-Zero candidates in the other 4 PDFs — all their referenced documents already had explicit titles. The two enriched entries in `guidelines_for_custodians`:
+| Source PDF | Discovered |
+|---|---:|
+| stock_broker_reporting_relaxations | 1 — SCCR Regulations, 2018 |
+| All other PDFs | 0 |
 
-| Identifier | descriptive_title added by AI |
-|---|---|
-| CIR/MIRSD/5/2013 dated Aug 27, 2013 | "general guidelines ... for dealing with conflict of interest" |
-| CIR/MIRSD/24/2011 dated 15 Dec 2011 | "registered intermediaries including Custodians are allowed to outsource non-core activities" |
+**Why SCCR was previously missed:** The PDF splits "Regulations," and "2018." across two paragraph blocks. The regex processes each paragraph individually and never sees the full title+year. Gemini receives the joined page text and correctly identifies the complete reference.
 
-**Eval metrics: identical to v3.** The AI enrichment is purely additive — `descriptive_title` is a separate field; the eval adapter prefers `short_title` (identifier + date) for canonical matching. The improvement is in human-readable output quality, not structural correctness metrics.
+| Fixture | Doc F1 | Page F1 | Title Exact Recall | Type Acc |
+|---|---:|---:|---:|---:|
+| cra_other_fsr_obligations | 100.0% | 100.0% | 100.0% | 100.0% |
+| ease_of_doing_investment_loc | 100.0% | 100.0% | 100.0% | 100.0% |
+| guidelines_for_custodians | 100.0% | 100.0% | 66.7% | 100.0% |
+| stock_broker_reporting_relaxations | 100.0% | 100.0% | 100.0% | 100.0% |
+| valuation_of_gold_and_silver | 100.0% | 100.0% | 100.0% | 100.0% |
 
-**Qualitative improvement:** Without AI, `"SEBI Circular CIR/MIRSD/5/2013 dated August 27, 2013"` is opaque. With AI, a compliance officer sees the subject of that circular directly in the output — based solely on context in the current PDF, no hallucination.
+| Metric | Value |
+|---|---:|
+| Doc Precision | 100.0% |
+| Doc Recall | 100.0% |
+| Doc F1 | 100.0% |
+| Page Precision | 100.0% |
+| Page Recall | 100.0% |
+| Page F1 | 100.0% |
+| Title Exact Recall | 93.3% |
+| Title Presence Recall | 100.0% |
+| Type Accuracy on Matched Docs | 100.0% |
+
+This is the **current production baseline**.
 
 ---
 
@@ -152,30 +172,8 @@ Zero candidates in the other 4 PDFs — all their referenced documents already h
 
 | Gap | Affected fixture | Root cause | Fix path |
 |---|---|---|---|
-| SCCR Regulations, 2018 not found | stock_broker_reporting_relaxations | "Regulations, 2018" split across PDF paragraphs — title and year in separate paragraph blocks | Require cross-paragraph text joining in PDF parser (v2 work) |
 | `CIR/MIRSD/24/2011` title exact miss | guidelines_for_custodians | Date in PDF is "15 Dec 2011"; gold canonical uses "December 15, 2011" | Month name normalization or gold alias update |
 | Banking Regulation Act singular/plural | guidelines_for_custodians | PDF uses "Regulations Act" (plural), gold canonical is "Regulation Act" (singular, legally correct) | Title normalization lookup table (v2 work) |
-
----
-
-## AI enrichment (optional pass, not yet run)
-
-Run with:
-```bash
-export GEMINI_API_KEY=<your-key>
-python3 agent-work/extract_references.py pdfs --use-ai
-python3 evals/make_predictions.py
-python3 evals/evaluate.py --gold-dir evals/ground_truth --pred-dir evals/predictions
-```
-
-The AI pass sends identifier-only circular records (those where `title` is null and only a bare `identifier + date` is known) to Gemini with surrounding evidence text.  Gemini is instructed to extract a `descriptive_title` only if a meaningful subject phrase appears in the evidence — it must not hallucinate an official title.
-
-Expected impact:
-- `title_presence_recall` may improve slightly if any circulars currently have no title at all (currently all have short_title populated, so impact here is minimal)
-- Human-readable output quality improves significantly: `"SEBI Circular CIR/MIRSD/5/2013 dated August 27, 2013"` becomes something like `"SEBI Circular CIR/MIRSD/5/2013 — Risk Management Framework for Custodians"`
-- `title_exact_recall` is unlikely to improve because the gold canonical format is `"identifier dated date"` while AI adds a subject phrase beyond that
-
-The AI pass is additive: it never removes a document or changes its type or pages.  Its `descriptive_title` is stored separately from `title` and `short_title`, so the baseline extraction is always preserved.
 
 ---
 

@@ -1,0 +1,137 @@
+[
+  {
+    "fixture_id": "cra_other_fsr_obligations",
+    "doc_metrics": {
+      "tp": 2,
+      "pred_total": 2,
+      "gold_total": 2,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "page_metrics": {
+      "tp": 5,
+      "pred_total": 5,
+      "gold_total": 5,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "title_exact_recall": 1.0,
+    "title_presence_recall": 1.0,
+    "type_accuracy_on_matched_docs": 1.0,
+    "resolution_precision": null,
+    "resolution_recall": null,
+    "missing_refs": [],
+    "extra_refs": [],
+    "page_mismatches": []
+  },
+  {
+    "fixture_id": "ease_of_doing_investment_loc",
+    "doc_metrics": {
+      "tp": 5,
+      "pred_total": 5,
+      "gold_total": 5,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "page_metrics": {
+      "tp": 6,
+      "pred_total": 6,
+      "gold_total": 6,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "title_exact_recall": 1.0,
+    "title_presence_recall": 1.0,
+    "type_accuracy_on_matched_docs": 1.0,
+    "resolution_precision": null,
+    "resolution_recall": null,
+    "missing_refs": [],
+    "extra_refs": [],
+    "page_mismatches": []
+  },
+  {
+    "fixture_id": "guidelines_for_custodians",
+    "doc_metrics": {
+      "tp": 6,
+      "pred_total": 6,
+      "gold_total": 6,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "page_metrics": {
+      "tp": 10,
+      "pred_total": 10,
+      "gold_total": 10,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "title_exact_recall": 0.6666666666666666,
+    "title_presence_recall": 1.0,
+    "type_accuracy_on_matched_docs": 1.0,
+    "resolution_precision": null,
+    "resolution_recall": null,
+    "missing_refs": [],
+    "extra_refs": [],
+    "page_mismatches": []
+  },
+  {
+    "fixture_id": "stock_broker_reporting_relaxations",
+    "doc_metrics": {
+      "tp": 4,
+      "pred_total": 4,
+      "gold_total": 4,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "page_metrics": {
+      "tp": 6,
+      "pred_total": 6,
+      "gold_total": 6,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "title_exact_recall": 1.0,
+    "title_presence_recall": 1.0,
+    "type_accuracy_on_matched_docs": 1.0,
+    "resolution_precision": null,
+    "resolution_recall": null,
+    "missing_refs": [],
+    "extra_refs": [],
+    "page_mismatches": []
+  },
+  {
+    "fixture_id": "valuation_of_gold_and_silver",
+    "doc_metrics": {
+      "tp": 2,
+      "pred_total": 2,
+      "gold_total": 2,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "page_metrics": {
+      "tp": 2,
+      "pred_total": 2,
+      "gold_total": 2,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "title_exact_recall": 1.0,
+    "title_presence_recall": 1.0,
+    "type_accuracy_on_matched_docs": 1.0,
+    "resolution_precision": null,
+    "resolution_recall": null,
+    "missing_refs": [],
+    "extra_refs": [],
+    "page_mismatches": []
+  }
+]

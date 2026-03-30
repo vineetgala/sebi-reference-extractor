@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SEBI Reference Viewer</title>
+  <style>
+    /* ─── RESET ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #f1f5f9;
+      --surface: #ffffff;
+      --border:  #e2e8f0;
+      --text:    #1a202c;
+      --muted:   #64748b;
+      --light:   #94a3b8;
+
+      /* type colours */
+      --c-act:   #2563eb;  --bg-act:   #eff6ff;
+      --c-regs:  #7c3aed;  --bg-regs:  #f5f3ff;
+      --c-mc:    #b45309;  --bg-mc:    #fffbeb;
+      --c-circ:  #059669;  --bg-circ:  #ecfdf5;
+      --c-notif: #6b7280;  --bg-notif: #f9fafb;
+
+      /* highlight overlays */
+      --hl-act:   rgba(37,  99, 235, .13);
+      --hl-regs:  rgba(124, 58, 237, .13);
+      --hl-mc:    rgba(180, 83,   9, .14);
+      --hl-circ:  rgba(  5,150, 105, .13);
+      --hl-notif: rgba(107,114, 128, .12);
+
+      --r:    8px;
+      --r-sm: 4px;
+      --shadow:    0 1px 3px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.05);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,.13), 0 2px 8px rgba(0,0,0,.07);
+    }
+
+    html { font-size: 14px; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ─── TOPBAR ─── */
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      height: 52px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14.5px;
+      font-weight: 700;
+      letter-spacing: -.01em;
+    }
+    .brand-badge {
+      background: #1d4ed8;
+      color: #fff;
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .brand-sep { color: var(--light); }
+
+    .sel-wrap { display: flex; align-items: center; gap: 8px; }
+    .sel-label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+    select#doc-sel {
+      font-family: inherit;
+      font-size: 12.5px;
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      background: var(--surface);
+      color: var(--text);
+      padding: 5px 28px 5px 10px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      cursor: pointer;
+      max-width: 420px;
+    }
+    select#doc-sel:focus { outline: 2px solid #2563eb; outline-offset: 1px; border-color: transparent; }
+
+    /* ─── META STRIP ─── */
+    #meta-strip {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 24px;
+      display: none;
+    }
+    #meta-strip.on { display: block; }
+    #meta-title { font-size: 14px; font-weight: 700; line-height: 1.4; margin-bottom: 5px; }
+    #meta-sub {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      background: #f1f5f9;
+      border-radius: 12px;
+      padding: 2px 9px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    /* ─── PAGE LAYOUT ─── */
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 316px;
+      gap: 20px;
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 20px 24px;
+      align-items: start;
+    }
+
+    /* ─── TEXT PANEL ─── */
+    .text-panel { min-width: 0; }
+
+    .legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+    .scope-note {
+      font-size: 11.5px;
+      color: var(--muted);
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      padding: 7px 12px;
+      border-radius: var(--r-sm);
+      margin-bottom: 18px;
+    }
+
+    .page-block { margin-bottom: 28px; }
+    .page-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--light);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .page-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .para-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid #1d4ed8;
+      border-radius: var(--r);
+      padding: 13px 16px;
+      margin-bottom: 10px;
+      line-height: 1.8;
+      font-size: 13.5px;
+      color: #2d3748;
+      transition: box-shadow .15s;
+    }
+    .para-card:hover { box-shadow: var(--shadow); }
+
+    /* ─── REFERENCE HIGHLIGHTS ─── */
+    mark.rh {
+      padding: 1px 2px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-style: normal;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-underline-offset: 2px;
+      transition: filter .12s;
+    }
+    mark.rh:hover { filter: brightness(.9); }
+
+    mark.rh.t-act   { background: var(--hl-act);   color: inherit; text-decoration-color: var(--c-act);   }
+    mark.rh.t-regs  { background: var(--hl-regs);  color: inherit; text-decoration-color: var(--c-regs);  }
+    mark.rh.t-mc    { background: var(--hl-mc);    color: inherit; text-decoration-color: var(--c-mc);    }
+    mark.rh.t-circ  { background: var(--hl-circ);  color: inherit; text-decoration-color: var(--c-circ);  }
+    mark.rh.t-notif { background: var(--hl-notif); color: inherit; text-decoration-color: var(--c-notif); }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      position: sticky;
+      top: 72px;
+      max-height: calc(100vh - 92px);
+      overflow-y: auto;
+    }
+    .sidebar-head {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .doc-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 11px 13px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: box-shadow .15s, border-color .15s;
+    }
+    .doc-card:hover { box-shadow: var(--shadow); }
+    .doc-card.active {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37,99,235,.12);
+    }
+    .doc-card-top {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 5px;
+      align-items: flex-start;
+    }
+    .doc-card-title { font-size: 12px; font-weight: 600; line-height: 1.4; flex: 1; }
+    .doc-card-meta { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+    .doc-card-id { font-family: ui-monospace, monospace; font-size: 10.5px; color: var(--muted); margin-bottom: 2px; }
+    .doc-card-count { font-size: 10.5px; color: var(--light); }
+
+    /* type badges */
+    .tbadge {
+      flex-shrink: 0;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .tbadge.t-act   { background: var(--bg-act);   color: var(--c-act);   }
+    .tbadge.t-regs  { background: var(--bg-regs);  color: var(--c-regs);  }
+    .tbadge.t-mc    { background: var(--bg-mc);    color: var(--c-mc);    }
+    .tbadge.t-circ  { background: var(--bg-circ);  color: var(--c-circ);  }
+    .tbadge.t-notif { background: var(--bg-notif); color: var(--c-notif); }
+
+    /* ─── TOOLTIP ─── */
+    #tip {
+      position: fixed;
+      z-index: 9999;
+      width: 340px;
+      max-width: calc(100vw - 24px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      box-shadow: var(--shadow-lg);
+      padding: 14px 16px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .1s;
+      font-size: 12.5px;
+    }
+    #tip.show { opacity: 1; }
+
+    .tip-type  { margin-bottom: 6px; }
+    .tip-title { font-size: 13px; font-weight: 700; line-height: 1.45; color: var(--text); margin-bottom: 9px; }
+    .tip-meta  { display: flex; flex-direction: column; gap: 3.5px; margin-bottom: 10px; }
+    .tip-row   { display: flex; gap: 6px; line-height: 1.4; }
+    .tip-key   { color: var(--muted); font-size: 11px; min-width: 70px; padding-top: 1px; }
+    .tip-val   { color: var(--text); font-size: 11px; font-weight: 500; }
+
+    .rel-pill {
+      background: #f1f5f9;
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .tip-hr { height: 1px; background: var(--border); margin: 10px 0; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 5px; margin-bottom: 10px; }
+    .chip {
+      background: #f1f5f9;
+      border-radius: 3px;
+      padding: 2px 6px;
+      font-size: 10.5px;
+      color: #475569;
+      font-weight: 500;
+    }
+
+    .conf-wrap  { margin-bottom: 10px; }
+    .conf-head  { font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; margin-bottom: 3px; }
+    .conf-track { height: 3px; background: #e2e8f0; border-radius: 2px; }
+    .conf-fill  { height: 100%; border-radius: 2px; transition: width .3s; }
+    .conf-high .conf-fill { background: #10b981; }
+    .conf-med  .conf-fill { background: #f59e0b; }
+    .conf-low  .conf-fill { background: #ef4444; }
+
+    .tip-ctx  { font-size: 11.5px; color: var(--muted); line-height: 1.7; }
+    .tip-ctx mark { background: transparent; font-weight: 700; color: var(--text); }
+
+    /* ─── EMPTY STATE ─── */
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 72px 24px;
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+    .empty-icon { font-size: 38px; margin-bottom: 14px; }
+    .empty-sub  { font-size: 12px; color: var(--light); margin-top: 6px; }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-badge">SEBI</span>
+    <span class="brand-sep">|</span>
+    Reference Viewer
+  </div>
+  <div class="sel-wrap">
+    <span class="sel-label">Circular:</span>
+    <select id="doc-sel">
+      <option value="">— select a document —</option>
+    </select>
+  </div>
+</header>
+
+<!-- META STRIP -->
+<div id="meta-strip">
+  <div id="meta-title"></div>
+  <div id="meta-sub"></div>
+</div>
+
+<!-- MAIN -->
+<div class="layout">
+  <div class="text-panel" id="text-panel">
+    <div class="empty">
+      <div class="empty-icon">📄</div>
+      Select a SEBI circular above to explore its document references.
+      <div class="empty-sub">Five circulars available · hover any highlight for reference detail</div>
+    </div>
+  </div>
+  <div class="sidebar" id="sidebar"></div>
+</div>
+
+<!-- TOOLTIP -->
+<div id="tip"></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════
+const TYPE_CSS = {
+  act: 't-act', regulations: 't-regs', master_circular: 't-mc',
+  circular: 't-circ', notification: 't-notif',
+};
+const TYPE_LABEL = {
+  act: 'Act', regulations: 'Regulations', master_circular: 'Master Circular',
+  circular: 'Circular', notification: 'Notification',
+};
+const TYPE_ICON = {
+  act: '⚖️', regulations: '📜', master_circular: '📋',
+  circular: '📄', notification: '📢',
+};
+const RELATION_LABEL = {
+  relies_on: 'Relies on', legal_basis: 'Legal basis',
+  references: 'References', amends: 'Amends',
+};
+
+// ═══════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════
+const esc = s =>
+  String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+const tcss   = t => TYPE_CSS[t]   || 't-circ';
+const tlabel = t => TYPE_LABEL[t] || t;
+const ticon  = t => TYPE_ICON[t]  || '📄';
+const rlabel = r => RELATION_LABEL[r] || r;
+
+/**
+ * Build highlighted HTML for a paragraph.
+ * entries: [{matchText, docType, mentionId, docId}, …]
+ */
+function buildHighlightHtml(text, entries) {
+  // Collect all match positions
+  const spans = [];
+  for (const e of entries) {
+    if (!e.matchText) continue;
+    let idx = 0;
+    while (true) {
+      const pos = text.indexOf(e.matchText, idx);
+      if (pos < 0) break;
+      spans.push({ start: pos, end: pos + e.matchText.length, e });
+      idx = pos + e.matchText.length;
+    }
+  }
+
+  // Sort: earlier start first; on equal start, longer span wins
+  spans.sort((a, b) =>
+    a.start !== b.start ? a.start - b.start : (b.end - b.start) - (a.end - a.start)
+  );
+
+  // Remove overlapping spans (keep first encountered)
+  const kept = [];
+  let cursor = 0;
+  for (const s of spans) {
+    if (s.start >= cursor) { kept.push(s); cursor = s.end; }
+  }
+
+  // Render
+  let html = '', pos = 0;
+  for (const s of kept) {
+    html += esc(text.slice(pos, s.start));
+    html += `<mark class="rh ${tcss(s.e.docType)}" data-mid="${s.e.mentionId}" data-did="${s.e.docId}">`;
+    html += esc(text.slice(s.start, s.end));
+    html += `</mark>`;
+    pos = s.end;
+  }
+  return html + esc(text.slice(pos));
+}
+
+/**
+ * Short evidence snippet for the tooltip, with the match bolded.
+ */
+function contextSnippet(evidence, matchText) {
+  if (!evidence) return '';
+  const idx = evidence.indexOf(matchText);
+  if (idx < 0) {
+    const t = evidence.slice(0, 220);
+    return esc(t) + (evidence.length > 220 ? '…' : '');
+  }
+  const lo = Math.max(0, idx - 55);
+  const hi = Math.min(evidence.length, idx + matchText.length + 90);
+  return (lo > 0 ? '…' : '') +
+    esc(evidence.slice(lo, idx)) +
+    `<mark>${esc(matchText)}</mark>` +
+    esc(evidence.slice(idx + matchText.length, hi)) +
+    (hi < evidence.length ? '…' : '');
+}
+
+/**
+ * Locator chips HTML from a target_locators object.
+ */
+function locatorChipsHtml(loc) {
+  if (!loc) return '';
+  const chips = [
+    ...(loc.chapters    || []).map(v => `Ch. ${v}`),
+    ...(loc.sections    || []).map(v => `Sec. ${v}`),
+    ...(loc.paragraphs  || []).map(v => `Para. ${v}`),
+    ...(loc.regulations || []).map(v => `Reg. ${v}`),
+    ...(loc.annexures   || []).map(v => `Annexure ${v}`),
+    ...(loc.clauses     || []).map(v => `Cl. ${v}`),
+  ];
+  if (!chips.length) return '';
+  return `<div class="chips">${chips.map(c => `<span class="chip">${esc(c)}</span>`).join('')}</div>`;
+}
+
+// ═══════════════════════════════════════════
+//  TOOLTIP
+// ═══════════════════════════════════════════
+const tipEl = document.getElementById('tip');
+let tipOn = false;
+
+function showTip(e, mentionId, mentionMap, docMap) {
+  const m   = mentionMap[mentionId];
+  const doc = m && docMap[m.document_id];
+  if (!m || !doc) return;
+
+  const matchText = (m.match_texts || [])[0] || '';
+  const title     = doc.title || doc.short_title || doc.identifier || '(Unknown)';
+  const dateStr   = doc.date || (doc.year ? String(doc.year) : '');
+  const confPct   = Math.round((m.confidence || 0) * 100);
+  const confCls   = m.confidence >= 0.85 ? 'conf-high' : m.confidence >= 0.70 ? 'conf-med' : 'conf-low';
+  const hasLoc    = m.target_locators &&
+    Object.values(m.target_locators).some(v => Array.isArray(v) && v.length > 0);
+  const locHtml   = hasLoc ? locatorChipsHtml(m.target_locators) : '';
+
+  tipEl.innerHTML = `
+    <div class="tip-type">
+      <span class="tbadge ${tcss(doc.document_type)}">${ticon(doc.document_type)}&nbsp;${tlabel(doc.document_type)}</span>
+    </div>
+    <div class="tip-title">${esc(title)}</div>
+    <div class="tip-meta">
+      ${doc.issuing_body ? `<div class="tip-row"><span class="tip-key">Issuer</span><span class="tip-val">${esc(doc.issuing_body)}</span></div>` : ''}
+      ${dateStr          ? `<div class="tip-row"><span class="tip-key">Date</span><span class="tip-val">${esc(dateStr)}</span></div>` : ''}
+      ${doc.identifier   ? `<div class="tip-row"><span class="tip-key">Identifier</span><span class="tip-val" style="font-family:monospace;font-size:10.5px">${esc(doc.identifier)}</span></div>` : ''}
+      <div class="tip-row">
+        <span class="tip-key">Relation</span>
+        <span class="tip-val"><span class="rel-pill">${esc(rlabel(m.relation_type))}</span></span>
+      </div>
+      <div class="tip-row">
+        <span class="tip-key">Found on</span>
+        <span class="tip-val">Page&nbsp;${m.source_page}</span>
+      </div>
+    </div>
+    ${hasLoc ? `<div style="font-size:11px;color:var(--muted);margin-bottom:1px">Points to:</div>${locHtml}` : ''}
+    <div class="tip-hr"></div>
+    <div class="${confCls} conf-wrap">
+      <div class="conf-head">
+        <span>Confidence</span>
+        <span style="font-weight:700">${confPct}%&nbsp;·&nbsp;${m.confidence_label || ''}</span>
+      </div>
+      <div class="conf-track"><div class="conf-fill" style="width:${confPct}%"></div></div>
+    </div>
+    <div class="tip-ctx">${contextSnippet(m.evidence_text || '', matchText)}</div>
+  `;
+
+  positionTip(e);
+  tipEl.classList.add('show');
+  tipOn = true;
+}
+
+function positionTip(e) {
+  const W = window.innerWidth, H = window.innerHeight;
+  const TW = 340, TH = tipEl.offsetHeight || 320;
+  const G = 14;
+  let x = e.clientX + G;
+  let y = e.clientY + G;
+  if (x + TW > W - G) x = e.clientX - TW - G;
+  if (y + TH > H - G) y = e.clientY - TH - G;
+  if (x < G) x = G;
+  if (y < G) y = G;
+  tipEl.style.left = x + 'px';
+  tipEl.style.top  = y + 'px';
+}
+
+function hideTip() { tipEl.classList.remove('show'); tipOn = false; }
+document.addEventListener('mousemove', e => { if (tipOn) positionTip(e); });
+
+// ═══════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════
+function render(refs) {
+  // Build lookup maps
+  const docMap     = Object.fromEntries(refs.referenced_documents.map(d => [d.document_id, d]));
+  const mentionMap = Object.fromEntries(refs.reference_mentions.map(m => [m.mention_id, m]));
+
+  // Group mentions: page → paragraphId → {evidenceText, mentions[]}
+  const byPage = {};
+  for (const m of refs.reference_mentions) {
+    if (!byPage[m.source_page]) byPage[m.source_page] = {};
+    const pid = m.source_paragraph_id;
+    if (!byPage[m.source_page][pid])
+      byPage[m.source_page][pid] = { evidenceText: m.evidence_text, mentions: [] };
+    byPage[m.source_page][pid].mentions.push(m);
+  }
+  const pages = Object.keys(byPage).map(Number).sort((a, b) => a - b);
+
+  // ── Meta strip ──
+  const src = refs.source_document;
+  document.getElementById('meta-title').textContent = src.title || src.file_name;
+  document.getElementById('meta-sub').innerHTML = [
+    src.circular_number ? `<span>${esc(src.circular_number)}</span>` : '',
+    src.issue_date      ? `<span>·&nbsp;${esc(src.issue_date)}</span>` : '',
+    `<span class="pill">${refs.referenced_documents.length}&nbsp;docs&nbsp;referenced</span>`,
+    `<span class="pill">${refs.reference_mentions.length}&nbsp;mentions</span>`,
+    `<span class="pill">${pages.length}&nbsp;pages&nbsp;with&nbsp;refs</span>`,
+  ].filter(Boolean).join('');
+  document.getElementById('meta-strip').classList.add('on');
+
+  // ── Legend ──
+  const typesPresent = [...new Set(refs.referenced_documents.map(d => d.document_type))];
+  const hlVarMap  = { act:'--hl-act', regulations:'--hl-regs', master_circular:'--hl-mc', circular:'--hl-circ', notification:'--hl-notif' };
+  const cVarMap   = { act:'--c-act',  regulations:'--c-regs',  master_circular:'--c-mc',  circular:'--c-circ',  notification:'--c-notif'  };
+  const legendHtml = `<div class="legend">${typesPresent.map(t =>
+    `<div class="legend-item">
+      <div class="legend-dot" style="background:var(${hlVarMap[t]||'--hl-circ'});border:1.5px solid var(${cVarMap[t]||'--c-circ'})"></div>
+      ${tlabel(t)}
+    </div>`
+  ).join('')}</div>`;
+
+  // ── Scope note ──
+  const scopeNote = `<div class="scope-note">
+    Showing ${pages.length} of ${src.page_count || '?'} pages — only pages containing document references are displayed.
+    Hover any highlighted span for reference detail. Click a document in the sidebar to jump to its first mention.
+  </div>`;
+
+  // ── Page blocks ──
+  let pagesHtml = '';
+  for (const pg of pages) {
+    pagesHtml += `<div class="page-block" id="page-${pg}"><div class="page-label">Page&nbsp;${pg}</div>`;
+    for (const [, para] of Object.entries(byPage[pg])) {
+      // Collect all match entries for this paragraph (from all co-located mentions)
+      const entries = [];
+      for (const m of para.mentions) {
+        const doc = docMap[m.document_id];
+        for (const mt of (m.match_texts || [])) {
+          entries.push({
+            matchText: mt,
+            docType:   doc?.document_type || 'circular',
+            mentionId: m.mention_id,
+            docId:     m.document_id,
+          });
+        }
+      }
+      pagesHtml += `<div class="para-card">${buildHighlightHtml(para.evidenceText || '', entries)}</div>`;
+    }
+    pagesHtml += `</div>`;
+  }
+
+  document.getElementById('text-panel').innerHTML = legendHtml + scopeNote + pagesHtml;
+
+  // ── Attach hover/active events to marks ──
+  document.querySelectorAll('mark.rh').forEach(el => {
+    el.addEventListener('mouseenter', e => {
+      showTip(e, el.dataset.mid, mentionMap, docMap);
+      document.querySelectorAll('.doc-card').forEach(c =>
+        c.classList.toggle('active', c.dataset.did === el.dataset.did));
+    });
+    el.addEventListener('mouseleave', () => {
+      hideTip();
+      document.querySelectorAll('.doc-card').forEach(c => c.classList.remove('active'));
+    });
+  });
+
+  // ── Sidebar ──
+  const countByDoc = {}, pagesByDoc = {};
+  for (const m of refs.reference_mentions) {
+    countByDoc[m.document_id]  = (countByDoc[m.document_id] || 0) + 1;
+    if (!pagesByDoc[m.document_id]) pagesByDoc[m.document_id] = new Set();
+    pagesByDoc[m.document_id].add(m.source_page);
+  }
+
+  let sbHtml = `<div class="sidebar-head">Referenced Documents&nbsp;(${refs.referenced_documents.length})</div>`;
+  for (const doc of refs.referenced_documents) {
+    const title  = doc.title || doc.short_title || doc.identifier || '(Unknown)';
+    const cnt    = countByDoc[doc.document_id] || 0;
+    const pgs    = pagesByDoc[doc.document_id] ? [...pagesByDoc[doc.document_id]].sort((a,b)=>a-b) : [];
+    const meta   = [doc.issuing_body, doc.date || (doc.year ? String(doc.year) : '')].filter(Boolean).join(' · ');
+    sbHtml += `
+      <div class="doc-card" data-did="${doc.document_id}">
+        <div class="doc-card-top">
+          <div class="doc-card-title">${esc(title)}</div>
+          <span class="tbadge ${tcss(doc.document_type)}">${tlabel(doc.document_type)}</span>
+        </div>
+        ${meta ? `<div class="doc-card-meta">${esc(meta)}</div>` : ''}
+        ${doc.identifier ? `<div class="doc-card-id">${esc(doc.identifier)}</div>` : ''}
+        <div class="doc-card-count">${cnt} mention${cnt !== 1 ? 's' : ''}&nbsp;·&nbsp;pp.&nbsp;${pgs.join(', ')}</div>
+      </div>`;
+  }
+  document.getElementById('sidebar').innerHTML = sbHtml;
+
+  // Sidebar click → scroll to first mention of that doc
+  document.querySelectorAll('.doc-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const did   = card.dataset.did;
+      const first = document.querySelector(`mark.rh[data-did="${did}"]`);
+      if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.querySelectorAll('.doc-card').forEach(c =>
+        c.classList.toggle('active', c.dataset.did === did));
+    });
+  });
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+async function init() {
+  const manifest = await fetch('/manifest.json').then(r => r.json());
+
+  // Load all reference JSONs in parallel
+  const loaded = await Promise.all(manifest.map(async entry => {
+    const id = entry.pdf_path.split('/').pop().replace('.pdf', '');
+    try {
+      const refs = await fetch(`/reference-output/${id}.references.json`).then(r => r.json());
+      return { id, refs };
+    } catch {
+      return null;
+    }
+  }));
+
+  const valid = loaded.filter(Boolean);
+  const cache = Object.fromEntries(valid.map(v => [v.id, v.refs]));
+  const sel   = document.getElementById('doc-sel');
+
+  for (const { id, refs } of valid) {
+    const opt = document.createElement('option');
+    opt.value = id;
+    const t = refs.source_document.title || id;
+    opt.textContent = t.length > 82 ? t.slice(0, 79) + '…' : t;
+    sel.appendChild(opt);
+  }
+
+  sel.addEventListener('change', () => {
+    const id = sel.value;
+    hideTip();
+    document.getElementById('sidebar').innerHTML = '';
+    if (!id || !cache[id]) {
+      document.getElementById('text-panel').innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">📄</div>
+          Select a SEBI circular above to explore its document references.
+          <div class="empty-sub">Five circulars available · hover any highlight for reference detail</div>
+        </div>`;
+      document.getElementById('meta-strip').classList.remove('on');
+      return;
+    }
+    render(cache[id]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+init().catch(err => {
+  console.error(err);
+  document.getElementById('text-panel').innerHTML = `
+    <div class="empty">
+      <div class="empty-icon">⚠️</div>
+      Could not load data. Make sure the server is running:<br>
+      <code style="font-family:monospace;font-size:12px">python3 viewer/serve.py</code>
+    </div>`;
+});
+</script>
+</body>
+</html>

@@ -13,7 +13,7 @@
     "issue_date": "March 23, 2026",
     "title": "Ease of doing business measures – Relaxations in certain reporting requirements for certain Stock Brokers and doing away with the requirement of reporting of demat account"
   },
-  "ai_discovery": {
+  "ai_enrichment": {
     "enabled": true,
     "provider": "gemini",
     "model": "gemini-2.5-flash",
@@ -31,6 +31,8 @@
       "document_type": "master_circular",
       "title": "Master Circular for Stock Brokers",
       "short_title": "hereinafter mentioned as \"Master Circular",
+      "descriptive_title": null,
+      "descriptive_title_source": null,
       "identifier": null,
       "date": "June 17, 2025",
       "year": 2025,
@@ -40,6 +42,7 @@
         "hereinafter mentioned as \"Master Circular"
       ],
       "title_source": "explicit_in_text",
+      "ai_review_notes": null,
       "resolution_status": "unresolved",
       "resolved_url": null
     },
@@ -48,12 +51,15 @@
       "document_type": "act",
       "title": "Securities and Exchange Board of India Act, 1992",
       "short_title": null,
+      "descriptive_title": null,
+      "descriptive_title_source": null,
       "identifier": null,
       "date": null,
       "year": 1992,
       "issuing_body": null,
       "aliases": [],
       "title_source": "explicit_in_text",
+      "ai_review_notes": null,
       "resolution_status": "unresolved",
       "resolved_url": null
     },
@@ -62,12 +68,15 @@
       "document_type": "act",
       "title": "Depositories Act, 1996",
       "short_title": null,
+      "descriptive_title": null,
+      "descriptive_title_source": null,
       "identifier": null,
       "date": null,
       "year": 1996,
       "issuing_body": null,
       "aliases": [],
       "title_source": "explicit_in_text",
+      "ai_review_notes": null,
       "resolution_status": "unresolved",
       "resolved_url": null
     },
@@ -76,12 +85,15 @@
       "document_type": "regulations",
       "title": "Securities Contracts (Regulation) (Stock Exchanges and Clearing Corporations) Regulations, 2018",
       "short_title": null,
+      "descriptive_title": null,
+      "descriptive_title_source": null,
       "identifier": null,
       "date": null,
       "year": 2018,
       "issuing_body": null,
       "aliases": [],
       "title_source": "ai_discovered",
+      "ai_review_notes": null,
       "resolution_status": "unresolved",
       "resolved_url": null
     }
@@ -273,8 +285,8 @@
       "match_texts": [
         "Regulation 51 of Securities Contracts (Regulation) (Stock Exchanges and Clearing Corporations) Regulations, 2018"
       ],
-      "evidence_text": "Regulation 51 of Securities Contracts (Regulation) (Stock Exchanges and Clearing Corporations) Regulations, 2018 to protect the interests of investors in securities and to promote the development of, and to regulate the securities markets.",
-      "relation_type": "references",
+      "evidence_text": "This circular is issued in exercise of powers conferred under Section 11(1) of Chapter IV of the Securities and Exchange Board of India Act, 1992, and Section 19 of Chapter IV of the Depositories Act, 1996 read with Regulation 51 of Securities Contracts (Regulation) (Stock Exchanges and Clearing Corporations) Regulations, 2018 to protect the interests of investors in securities and to promote the development of, and to regulate the securities markets.",
+      "relation_type": "legal_basis",
       "target_locators": {
         "raw": null,
         "paragraphs": [],

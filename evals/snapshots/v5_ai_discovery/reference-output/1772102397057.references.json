@@ -13,7 +13,7 @@
     "issue_date": "February 26, 2026",
     "title": "Valuation of physical Gold and Silver held by mutual fund schemes"
   },
-  "ai_discovery": {
+  "ai_enrichment": {
     "enabled": true,
     "provider": "gemini",
     "model": "gemini-2.5-flash",
@@ -31,12 +31,15 @@
       "document_type": "regulations",
       "title": "SEBI (Mutual Funds) Regulations, 2026",
       "short_title": null,
+      "descriptive_title": null,
+      "descriptive_title_source": null,
       "identifier": null,
       "date": null,
       "year": 2026,
       "issuing_body": "SEBI",
       "aliases": [],
       "title_source": "explicit_in_text",
+      "ai_review_notes": null,
       "resolution_status": "unresolved",
       "resolved_url": null
     },
@@ -45,12 +48,15 @@
       "document_type": "regulations",
       "title": "SEBI (Mutual Funds) Regulations, 1996",
       "short_title": null,
+      "descriptive_title": null,
+      "descriptive_title_source": null,
       "identifier": null,
       "date": null,
       "year": 1996,
       "issuing_body": "SEBI",
       "aliases": [],
       "title_source": "explicit_in_text",
+      "ai_review_notes": null,
       "resolution_status": "unresolved",
       "resolved_url": null
     },
@@ -59,12 +65,15 @@
       "document_type": "notification",
       "title": null,
       "short_title": null,
+      "descriptive_title": null,
+      "descriptive_title_source": null,
       "identifier": "LAD-NRO/GN/2026/294",
       "date": "January 14, 2026",
       "year": 2026,
       "issuing_body": null,
       "aliases": [],
       "title_source": "ai_discovered",
+      "ai_review_notes": null,
       "resolution_status": "unresolved",
       "resolved_url": null
     }

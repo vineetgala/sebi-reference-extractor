@@ -21,8 +21,16 @@ python3 agent-work/extract_references.py path/to/circular.pdf
 # Extract from a directory (deterministic only)
 python3 agent-work/extract_references.py pdfs/
 
-# Extract with Gemini AI enrichment (adds descriptive titles to identifier-only circulars)
+# Extract with Gemini AI discovery (finds references regex missed — cross-paragraph splits,
+# non-hardcoded acts, non-standard phrasing)
 python3 agent-work/extract_references.py pdfs/ --use-ai
+
+# Launch the API server (Swagger UI at http://localhost:8000/docs)
+pip install -r api/requirements.txt
+uvicorn api.server:app --reload --port 8000
+
+# Launch the reference viewer (open http://localhost:7890/viewer/)
+python3 viewer/serve.py
 
 # Convert extractor output → eval scorer format
 python3 evals/make_predictions.py
@@ -46,7 +54,7 @@ agent-work/
 
 pdfs/                        # 5 SEBI source PDFs used for development
 
-reference-output/            # current extraction outputs (AI-enriched, v4 state)
+reference-output/            # current extraction outputs (AI-discovery, v5 state)
   *.references.json          # one per PDF
 
 evals/
@@ -57,9 +65,18 @@ evals/
   snapshots/                 # COMMITTED — frozen eval results at each milestone
     v0_baseline/             # before any fixes: Doc F1 83.6%, Page F1 76.4%
     v3_optimized/            # after eval-driven fixes: Doc F1 97.1%, Page F1 98.2%
-    v4_ai_enriched/          # + Gemini descriptive titles: same structural metrics, richer output
-  RESULTS.md                 # full progression table + known gaps + AI enrichment explanation
+    v4_ai_enriched/          # Gemini title enrichment only (superseded by v5)
+    v5_ai_discovery/         # regex + AI discovery: Doc F1 100%, Page F1 100%
+  RESULTS.md                 # full progression table + known gaps
   fixtures/README.md         # fixture notes, dataset gaps, scoring conventions
+
+api/
+  server.py                # FastAPI server — POST /extract + Swagger UI at /docs
+  requirements.txt         # fastapi, uvicorn, python-multipart
+
+viewer/
+  index.html               # browser-based reference viewer (pure HTML/CSS/JS, no build step)
+  serve.py                 # minimal stdlib HTTP server; serves project root so paths resolve
 
 manifest.json                # source PDF metadata (page URLs, PDF URLs, local paths, sizes)
 .env                         # GITIGNORED — put GEMINI_API_KEY=... here
@@ -95,12 +112,14 @@ Four compiled patterns handle the main reference types in SEBI circulars:
 - Preceding text before each match is scanned for section/para/regulation/clause/annexure numbers
 - Stored in `target_locators` per mention — tells you *where inside* the referenced doc the circular is pointing
 
-### 5. AI enrichment (`--use-ai`)
-- Only fires for circular/notification records where `title` is null (identifier-only citations)
-- Sends up to 3 evidence snippets per candidate to Gemini
-- Strict grounded prompt: "only extract a phrase from the evidence — never invent an official title"
-- Result stored as `descriptive_title` field, separate from deterministic `title` and `short_title`
-- `make_predictions.py` uses priority: `title > short_title > descriptive_title` so AI enrichment doesn't affect eval metrics (by design — it's human-readable enrichment, not a canonical key)
+### 5. AI discovery (`--use-ai`)
+- Fires once per document after regex extraction completes
+- Full document text is sent to Gemini, page-by-page (paragraphs joined with spaces so cross-paragraph title fragments are continuous)
+- Already-found regex records are listed in the prompt — Gemini returns only NEW references
+- `temperature: 0.1` for near-deterministic output
+- Structured JSON response: `document_type`, `title`, `identifier`, `year_or_date`, `source_page`, `evidence_text`, `exact_quote`
+- Post-processing filters: self-references dropped; locator strings in the `identifier` field cleared (e.g. "Regulation 51" → null, kept if title exists); truncated act titles dropped; AI-discovered notifications with no title dropped
+- Discovered records get `title_source: "ai_discovered"` and are merged into the registry like any other record
 
 ---
 
@@ -130,8 +149,8 @@ The scorer (`evals/evaluate.py`) matches predictions to gold using:
 | Snapshot | Doc F1 | Page F1 | Title Exact | Doc Precision | Description |
 |---|---:|---:|---:|---:|---|
 | v0 baseline | 83.6% | 76.4% | 71.0% | 91.0% | Initial extractor, 4 bugs |
-| v3 optimized | 97.1% | 98.2% | 88.3% | 100.0% | After eval-driven fixes |
-| v4 AI enriched | 97.1% | 98.2% | 88.3% | 100.0% | + Gemini descriptive titles |
+| v3 optimized | 97.1% | 98.2% | 88.3% | 100.0% | After eval-driven regex fixes |
+| v5 AI discovery | 100.0% | 100.0% | 93.3% | 100.0% | regex + Gemini discovery pass |
 
 Full progression with per-fixture breakdown and fix-by-fix explanation: `evals/RESULTS.md`
 
@@ -140,7 +159,7 @@ Each snapshot is self-contained in `evals/snapshots/{name}/` with:
 - `eval_results.json` — machine-readable scores
 - `eval_results.md` — markdown table
 - `notes.md` — what changed and why
-- `reference-output/*.json` (v3 and v4 only) — raw extractor outputs
+- `reference-output/*.json` (v3, v4, v5 only) — raw extractor outputs
 
 ---
 
@@ -160,15 +179,11 @@ These are the 5 specific fixes driven by running `evaluate.py` on the initial ex
 
 ## Known gaps (not fixed, documented)
 
-1. **SCCR Regulations, 2018 not found** (`stock_broker_reporting_relaxations`) — the title and year "2018" fall in separate PDF paragraphs due to line-wrap. Requires cross-paragraph joining in the parser. V2 work.
-
-2. **Title exact recall 66.7% for `guidelines_for_custodians`** — two unresolved mismatches:
+1. **Title exact recall 66.7% for `guidelines_for_custodians`** — two unresolved mismatches:
    - `CIR/MIRSD/24/2011`: PDF date is "15 Dec 2011", gold canonical uses "December 15, 2011" (month format differs after normalize)
    - `Banking Regulation Act`: PDF says "Regulations Act" (plural), gold canonical is "Regulation Act" (legally correct singular)
 
-3. **Doc recall 95%** — the SCCR miss accounts for the full 5pp gap from 100%.
-
-4. **Resolution metrics are n/a** — no URL resolution is implemented. SEBI URLs are not deterministically derivable from circular identifiers alone; would need a metadata index.
+2. **Resolution metrics are n/a** — no URL resolution is implemented. SEBI URLs are not deterministically derivable from circular identifiers alone; would need a metadata index.
 
 ---
 
@@ -192,13 +207,15 @@ Roughly prioritized:
 4. **Broader SEBI coverage** — run against the full SEBI archive for the knowledge graph scale story
 5. **Banking Regulation Act title normalization** — minor; fix singular/plural canonical for this specific act
 
+Already done: **Reference Viewer** (`viewer/`) — browser UI that renders each referenced paragraph with highlights and hover-cards.
+Already done: **API Server** (`api/server.py`) — FastAPI + Swagger; `POST /extract` accepts a PDF upload and returns the full reference JSON.
+
 ---
 
 ## Design decisions (don't undo without reason)
 
 - **Predictions gitignored, snapshots committed** — predictions are derived; snapshots are the evidence trail
-- **AI enrichment is additive only** — it never removes or modifies deterministic fields; `descriptive_title` is a separate field
-- **`make_predictions.py` prefers `title > short_title > descriptive_title`** — short_title (identifier+date) matches gold canonical format; AI descriptive_title is enrichment for humans, not for eval matching
+- **AI discovery is a second layer, not a replacement** — regex handles common well-defined patterns; AI catches the long tail (cross-paragraph splits, acts not in the hardcoded list, non-standard phrasing). AI never modifies regex-found records.
 - **Generic "Master Circular" alias is kept** — all current PDFs only reference one master circular; removing it breaks page-level recall for alias mentions
 - **Bare notifications filtered in adapter, not extractor** — they are real references; we just abstain from scoring them since they have no stable identifier. The raw extractor output still contains them for transparency.
 - **No pip install** — all deps vendored under `agent-work/vendor/`; this was intentional for portability
@@ -210,7 +227,9 @@ Roughly prioritized:
 - [x] Agent that takes one PDF and extracts references with titles and page numbers
 - [x] Evaluations setup (ground truth for 5 fixtures, scorer, metrics)
 - [x] Before/after improvement story with concrete measured scores
-- [x] AI enrichment via Gemini 2.5 Flash (descriptive titles for identifier-only circulars)
+- [x] AI discovery via Gemini 2.5 Flash (finds references regex missed)
 - [x] Complete run instructions in README.md
+- [x] Reference Viewer — browser UI with inline highlights and hover-cards
+- [x] API Server — FastAPI + Swagger UI, POST /extract accepts PDF upload
 - [ ] Public GitHub repo (push when ready)
 - [ ] 2-minute video covering: models/tools used, extraction approach, eval methodology, limitations, v2 scale story
